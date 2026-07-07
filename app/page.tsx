@@ -1,27 +1,27 @@
-import RingConfigurator from "@/components/RingConfigurator";
-import Link from "next/link";
+import { getPublishedPieces } from "@/lib/products";
+import CollectionGrid from "@/components/CollectionGrid";
+import EditorialHeader from "@/components/EditorialHeader";
 
-export default function Home() {
+// Re-fetch on every request rather than caching, since pieces get
+// added/published from the admin panel and should show up immediately.
+export const dynamic = "force-dynamic";
+
+export default async function ShowroomGallery() {
+  const pieces = await getPublishedPieces();
+
   return (
-    <div className="min-h-screen bg-[#0c0a08] text-[#ede6d8]">
-      {/* Hero */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#c9a66b_0.8px,transparent_1px)] bg-[length:40px_40px] opacity-10"></div>
-        <div className="relative z-10 text-center px-6 max-w-4xl">
-          <h1 className="text-7xl md:text-8xl font-display italic tracking-tight mb-6">
-            The Commissioning Room
-          </h1>
-          <p className="text-xl md:text-2xl mb-10 text-[#a69c8c]">Bespoke jewelry. Crafted in silence. Worn with purpose.</p>
-          <Link 
-            href="#configurator"
-            className="inline-block bg-[#6b1e20] hover:bg-[#8a2a2c] transition-colors px-12 py-5 text-sm tracking-[0.12em] uppercase font-medium"
-          >
-            Begin Your Commission
-          </Link>
-        </div>
+    <main className="min-h-screen bg-[#0A0A0A] px-6 py-16 md:py-24">
+      <section className="max-w-7xl mx-auto mb-16 md:mb-24 text-center md:text-left space-y-4">
+        <EditorialHeader eyebrow="Curated Exhibition" title="The Permanent Collection" />
       </section>
 
-      <RingConfigurator />
-    </div>
+      {pieces.length > 0 ? (
+        <CollectionGrid pieces={pieces} />
+      ) : (
+        <p className="max-w-7xl mx-auto text-center text-sm text-zinc-500 font-sans py-24">
+          The collection is being prepared. Please check back shortly.
+        </p>
+      )}
+    </main>
   );
 }

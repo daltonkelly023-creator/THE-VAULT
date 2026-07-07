@@ -306,7 +306,13 @@
   color: #0C0A08;
 }
 
-/* --- Assay ticker (Atelier signature element) --- */
+/* --- Assay ticker (Atelier signature element) ---
+   Brass-plate / wax-seal reskin: embossed metal plaque with an inset
+   engraved border and a small stamped-wax medallion peeking over the top
+   edge, in place of the earlier flat bordered box. Purely decorative —
+   .assay-row / .assay-grid / .assay-cell / .assay-label / .assay-value
+   below are untouched, so the scramble-text + pricing logic underneath
+   don't need to change at all. */
 
 .assay-ticker {
   position: absolute;
@@ -317,11 +323,35 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid rgba(197, 168, 128, 0.3);
-  background: rgba(10, 9, 8, 0.65);
-  backdrop-filter: blur(6px);
+  padding: 16px 18px;
+  border-radius: 3px;
+  background: linear-gradient(155deg, rgba(58, 46, 26, 0.95) 0%, rgba(20, 16, 10, 0.95) 60%, rgba(10, 8, 5, 0.96) 100%);
+  border: 1px solid rgba(197, 168, 128, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 200, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 6px 18px rgba(0, 0, 0, 0.45);
   font-family: var(--font-sans), sans-serif;
+}
+
+.assay-ticker::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(197, 168, 128, 0.18);
+  pointer-events: none;
+}
+
+.assay-ticker::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #E8C88C, #8C5A28 55%, #3C1E0A 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .assay-row {
@@ -426,7 +456,10 @@
   color: #ede6d8;
 }
 
-/* Terra signature element — mirrors .assay-ticker's frame, earthy accent */
+/* Terra signature element — mirrors .assay-ticker's brass-plate treatment,
+   bronze/earth tone instead of gold so the two collections still read as
+   visually distinct at a glance. */
+
 .strata-line {
   position: absolute;
   top: 16px;
@@ -436,11 +469,35 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid rgba(140, 111, 79, 0.35);
-  background: rgba(28, 23, 18, 0.65);
-  backdrop-filter: blur(6px);
+  padding: 16px 18px;
+  border-radius: 3px;
+  background: linear-gradient(155deg, rgba(46, 38, 26, 0.95) 0%, rgba(18, 14, 10, 0.95) 60%, rgba(9, 7, 5, 0.96) 100%);
+  border: 1px solid rgba(140, 111, 79, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(220, 195, 160, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 6px 18px rgba(0, 0, 0, 0.45);
   font-family: var(--font-sans), sans-serif;
+}
+
+.strata-line::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(140, 111, 79, 0.16);
+  pointer-events: none;
+}
+
+.strata-line::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #C9A66B, #6B4A2F 55%, #2A1A0F 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
 
 .strata-row {
