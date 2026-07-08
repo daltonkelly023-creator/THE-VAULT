@@ -1,5 +1,6 @@
-// app/piece/[id]/page.tsx
-"use client";
+git add .
+git commit -m "feat: cinematic detail page, configurator, contact fix"
+git push origin main"use client";
 
 import Link from "next/link";
 import Image from "next/image";
