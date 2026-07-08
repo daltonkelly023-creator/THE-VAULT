@@ -14,14 +14,6 @@ const categories = [
   { key: "watch", label: "Timepieces" },
 ];
 
-const categoryColors: Record<string, { glow: string; text: string }> = {
-  ring: { glow: "shadow-blue-500/30", text: "text-blue-300" },
-  necklace: { glow: "shadow-amber-500/30", text: "text-amber-300" },
-  bracelet: { glow: "shadow-emerald-500/30", text: "text-emerald-300" },
-  earring: { glow: "shadow-rose-500/30", text: "text-rose-300" },
-  watch: { glow: "shadow-slate-400/30", text: "text-slate-300" },
-};
-
 export default async function Collection({
   searchParams,
 }: {
@@ -57,34 +49,34 @@ export default async function Collection({
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5] relative overflow-hidden">
-      {/* Warm bronze background gradient */}
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center_top,rgba(197,168,128,0.08)_0%,rgba(10,10,10,1)_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(139,90,43,0.05)_0%,transparent_60%)]" />
+      {/* Warm bronze atmosphere */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(197,168,128,0.06)_0%,transparent_50%)]" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#1a1209]/50 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative" style={{ zIndex: 2 }}>
+      <div className="relative min-h-screen flex flex-col">
         {/* Header */}
-        <div className="text-center pt-24 pb-12">
-          <h1 className="text-5xl md:text-7xl font-serif text-[#C5A880] mb-4 tracking-widest">
+        <div className="text-center pt-16 pb-8">
+          <h1 className="text-5xl md:text-6xl font-serif text-[#C5A880] tracking-widest mb-3">
             The Showroom
           </h1>
-          <p className="text-sm text-[#666] tracking-[0.3em] uppercase">
+          <p className="text-xs text-[#666] tracking-[0.3em] uppercase">
             Select a category to filter
           </p>
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-20 px-4">
+        <div className="flex flex-wrap justify-center gap-2 mb-12 px-4">
           {categories.map((cat) => (
             <Link
               key={cat.key}
               href={cat.key === "all" ? "/collection" : `/collection?category=${cat.key}`}
-              className={`px-6 py-2.5 text-xs tracking-[0.2em] uppercase border transition-all duration-300 ${
+              className={`px-5 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ${
                 activeCategory === cat.key
                   ? "border-[#C5A880] text-[#C5A880] bg-[#C5A880]/10"
-                  : "border-[#333] text-[#666] hover:border-[#C5A880] hover:text-[#C5A880]"
+                  : "border-[#2a2a2a] text-[#555] hover:border-[#C5A880]/50 hover:text-[#888]"
               }`}
             >
               {cat.label}
@@ -96,28 +88,44 @@ export default async function Collection({
           <p className="text-center text-[#666] py-24">No pieces in this category yet.</p>
         )}
 
-        {/* Showroom Floor — Curved Arrangement */}
-        <div className="relative pb-32 px-4">
-          {/* Spotlight beam effect */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[500px] pointer-events-none">
-            <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_0%,transparent_0deg,rgba(197,168,128,0.03)_20deg,rgba(197,168,128,0.08)_40deg,rgba(197,168,128,0.03)_60deg,transparent_80deg)]" />
+        {/* Showroom Stage */}
+        <div className="flex-1 flex flex-col items-center justify-end pb-16 px-4 relative">
+          
+          {/* Hanging Fixture */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-32 flex flex-col items-center">
+            {/* Cord */}
+            <div className="w-px h-24 bg-gradient-to-b from-transparent to-[#333]" />
+            {/* Fixture body */}
+            <div className="relative">
+              <div className="w-16 h-8 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] rounded-t-full border border-[#333]" />
+              <div className="w-12 h-4 bg-[#C5A880]/20 mx-auto rounded-b-lg" />
+              {/* Bulb glow */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#C5A880]/30 rounded-full blur-md" />
+            </div>
           </div>
 
-          {/* Pieces arranged in arc */}
-          <div className="flex items-end justify-center gap-4 md:gap-8 lg:gap-12 max-w-6xl mx-auto relative" style={{ perspective: "1000px" }}>
+          {/* Light Cone */}
+          <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[500px] h-[400px] pointer-events-none">
+            <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_0%,transparent_0deg,rgba(197,168,128,0.04)_30deg,rgba(197,168,128,0.08)_60deg,rgba(197,168,128,0.04)_90deg,transparent_120deg)]" />
+          </div>
+
+          {/* Floor Glow */}
+          <div className="absolute bottom-32 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.08)_0%,transparent_70%)] pointer-events-none" />
+
+          {/* Pieces on Stage */}
+          <div className="flex items-end justify-center gap-2 md:gap-6 lg:gap-10 max-w-5xl mx-auto relative">
             {products?.map((piece, index) => {
               const imageUrl = getImageUrl(piece.hero_image_path);
-              const colors = categoryColors[piece.category] || { glow: "shadow-[#C5A880]/20", text: "text-[#C5A880]" };
               const total = products.length;
               const center = Math.floor(total / 2);
               const distance = Math.abs(index - center);
               const isCenter = index === center;
 
-              // Arc positioning: center piece forward, sides recede
-              const zOffset = isCenter ? 40 : 40 - distance * 15;
-              const yOffset = isCenter ? 0 : distance * 8;
-              const scale = isCenter ? 1 : Math.max(0.75, 1 - distance * 0.1);
-              const brightness = isCenter ? 100 : Math.max(40, 100 - distance * 20);
+              // Stage positioning
+              const scale = isCenter ? 1.15 : Math.max(0.7, 1 - distance * 0.15);
+              const translateY = isCenter ? 0 : distance * 15;
+              const brightness = isCenter ? 100 : Math.max(35, 100 - distance * 25);
+              const zIndex = isCenter ? 20 : 20 - distance;
 
               return (
                 <Link
@@ -125,53 +133,55 @@ export default async function Collection({
                   href={`/piece/${piece.id}`}
                   className="group relative transition-all duration-700 ease-out"
                   style={{
-                    transform: `translateY(${yOffset}px) translateZ(${zOffset}px) scale(${scale})`,
+                    transform: `translateY(${translateY}px) scale(${scale})`,
                     filter: `brightness(${brightness}%)`,
-                    zIndex: isCenter ? 10 : 10 - distance,
+                    zIndex,
                   }}
                 >
-                  {/* Spotlight on hover */}
-                  <div className={`absolute -top-20 left-1/2 -translate-x-1/2 w-32 h-40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}>
-                    <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(197,168,128,0.15),transparent)]" />
+                  {/* Pedestal */}
+                  <div className={`relative mx-auto mb-2 transition-all duration-500 ${isCenter ? 'w-32 md:w-40' : 'w-20 md:w-28'}`}>
+                    {/* Pedestal top */}
+                    <div className="h-2 bg-gradient-to-b from-[#3a3a3a] to-[#2a2a2a] rounded-sm" />
+                    {/* Pedestal body */}
+                    <div className="h-8 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] mx-2" />
+                    {/* Pedestal base */}
+                    <div className="h-1 bg-[#333] rounded-sm" />
                   </div>
 
-                  {/* Glass case effect */}
-                  <div className={`relative border border-[#222] group-hover:border-[#C5A880]/50 transition-all duration-500 ${colors.glow} group-hover:shadow-2xl`}>
-                    {/* Top reflection highlight */}
-                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Glass Case */}
+                  <div className={`relative border transition-all duration-500 group-hover:border-[#C5A880]/40 ${isCenter ? 'border-[#333] shadow-2xl shadow-[#C5A880]/10' : 'border-[#222]/50'}`}>
+                    
+                    {/* Top highlight */}
+                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C5A880]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    <div className="w-48 md:w-56 lg:w-64 aspect-[3/4] relative overflow-hidden bg-[#0d0d0d]">
+                    <div className={`relative overflow-hidden bg-[#0d0d0d] ${isCenter ? 'w-40 h-52 md:w-48 md:h-64' : 'w-24 h-32 md:w-32 md:h-40'}`}>
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
                           alt={piece.name}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
-                          sizes="(max-width: 768px) 192px, (max-width: 1024px) 224px, 256px"
+                          sizes="(max-width: 768px) 160px, 192px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-[#333] text-xs tracking-widest">NO IMAGE</span>
+                          <span className="text-[#333] text-[10px] tracking-widest">NO IMAGE</span>
                         </div>
                       )}
 
-                      {/* Bottom reflection */}
-                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#C5A880]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {/* Glass reflection */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
                     </div>
 
-                    {/* Category badge */}
-                    <div className="absolute top-3 left-3">
-                      <span className={`text-[9px] tracking-[0.2em] uppercase ${colors.text} bg-black/70 px-2 py-1 backdrop-blur-sm`}>
-                        {piece.category}
-                      </span>
-                    </div>
+                    {/* Bottom reflection on floor */}
+                    <div className="absolute -bottom-8 left-0 right-0 h-8 bg-gradient-to-b from-[#C5A880]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
                   </div>
 
-                  {/* Info below */}
-                  <div className="mt-4 text-center opacity-60 group-hover:opacity-100 transition-opacity duration-500">
-                    <p className="text-[10px] text-[#666] tracking-widest uppercase mb-1">{piece.collection}</p>
-                    <h3 className="text-[#C5A880] font-serif text-sm md:text-base mb-1">{piece.name}</h3>
-                    <p className="text-[#888] text-xs tracking-widest">
+                  {/* Info */}
+                  <div className={`mt-4 text-center transition-all duration-500 ${isCenter ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
+                    <p className="text-[9px] text-[#666] tracking-[0.2em] uppercase mb-1">{piece.collection}</p>
+                    <h3 className="text-[#C5A880] font-serif text-xs md:text-sm mb-1">{piece.name}</h3>
+                    <p className="text-[#555] text-[10px] tracking-widest">
                       {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
                     </p>
                   </div>
