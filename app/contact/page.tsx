@@ -101,9 +101,12 @@ export default function Contact() {
         </form>
       )}
 
-      <p className="text-center text-[#444] text-xs mt-8">
+      <p className="text-center text-[#666] text-xs mt-8">
         Or email directly:{" "}
-        <a href="mailto:goblinsharkyellow@gmail.com" className="text-[#666] hover:text-[#C5A880]">
+        <a 
+          href="mailto:goblinsharkyellow@gmail.com" 
+          className="text-[#C5A880] hover:text-[#e5e5e5] transition-colors border-b border-[#C5A880]/50 hover:border-[#e5e5e5] pb-0.5"
+        >
           goblinsharkyellow@gmail.com
         </a>
       </p>
