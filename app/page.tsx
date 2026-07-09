@@ -1,4 +1,3 @@
-// app/page.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
@@ -21,21 +20,21 @@ export default async function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5]">
+    <main className="min-h-screen bg-[#02040a] text-[#e5e5e5]">
       {/* Hero */}
       <section className="relative flex flex-col items-center justify-center min-h-[70vh] text-center px-4 overflow-hidden">
         <Particles />
         <div className="relative" style={{ zIndex: 2 }}>
-          <h1 className="text-6xl md:text-8xl font-serif tracking-widest text-[#C5A880] mb-6">
+          <h1 className="text-6xl md:text-8xl font-serif tracking-widest text-[#8ab4e8] mb-6">
             THE VAULT
           </h1>
-          <p className="text-lg text-[#888] max-w-lg mb-10 font-light tracking-wide leading-relaxed">
+          <p className="text-lg text-[#5a7a9a] max-w-lg mb-10 font-light tracking-wide leading-relaxed">
             Bespoke commissions from the atelier of master craftsmen. 
             Each piece forged once, never repeated.
           </p>
           <Link
             href="/collection"
-            className="px-10 py-4 border border-[#C5A880] text-[#C5A880] hover:bg-[#C5A880] hover:text-[#0a0a0a] transition-all duration-300 tracking-[0.2em] text-sm uppercase"
+            className="px-10 py-4 border border-[#4a90d9] text-[#4a90d9] hover:bg-[#4a90d9] hover:text-[#02040a] transition-all duration-300 tracking-[0.2em] text-sm uppercase"
           >
             Enter the Showroom
           </Link>
@@ -43,11 +42,11 @@ export default async function Home() {
       </section>
 
       {/* Divider */}
-      <div className="w-24 h-px bg-[#333] mx-auto mb-20" />
+      <div className="w-24 h-px bg-[#0a1a3a] mx-auto mb-20" />
 
       {/* Selected Works */}
       <section className="max-w-6xl mx-auto px-4 pb-24">
-        <h2 className="text-center text-3xl font-serif text-[#C5A880] mb-16 tracking-widest">
+        <h2 className="text-center text-3xl font-serif text-[#8ab4e8] mb-16 tracking-widest">
           Selected Works
         </h2>
         
@@ -59,9 +58,9 @@ export default async function Home() {
                 <Link
                   key={piece.id}
                   href={`/piece/${piece.id}`}
-                  className="group border border-[#222] hover:border-[#C5A880] transition-all duration-500 hover:-translate-y-1"
+                  className="group border border-[#0a1a3a] hover:border-[#4a90d9] transition-all duration-500 hover:-translate-y-1"
                 >
-                  <div className="aspect-square bg-[#111] relative overflow-hidden">
+                  <div className="aspect-square bg-[#02040a] relative overflow-hidden">
                     {imageUrl ? (
                       <Image
                         src={imageUrl}
@@ -72,17 +71,17 @@ export default async function Home() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[#333] text-sm tracking-widest">NO IMAGE</span>
+                        <span className="text-[#1a3a5a] text-sm tracking-widest">NO IMAGE</span>
                       </div>
                     )}
                   </div>
                   <div className="p-6">
-                    <p className="text-xs text-[#666] tracking-widest uppercase mb-2">
+                    <p className="text-xs text-[#3a5570] tracking-widest uppercase mb-2">
                       {piece.collection}
                     </p>
-                    <h3 className="text-[#C5A880] font-serif text-xl mb-1">{piece.name}</h3>
-                    <p className="text-[#666] text-sm mb-3 capitalize">{piece.category}</p>
-                    <p className="text-[#888] text-xs tracking-widest">
+                    <h3 className="text-[#8ab4e8] font-serif text-xl mb-1">{piece.name}</h3>
+                    <p className="text-[#3a5570] text-sm mb-3 capitalize">{piece.category}</p>
+                    <p className="text-[#5a7a9a] text-xs tracking-widest">
                       {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
                     </p>
                   </div>
@@ -91,13 +90,13 @@ export default async function Home() {
             })}
           </div>
         ) : (
-          <p className="text-center text-[#666]">The vault is being curated.</p>
+          <p className="text-center text-[#3a5570]">The vault is being curated.</p>
         )}
 
         <div className="text-center mt-12">
           <Link
             href="/collection"
-            className="inline-block text-xs text-[#666] hover:text-[#C5A880] transition-colors tracking-widest uppercase border-b border-[#333] hover:border-[#C5A880] pb-1"
+            className="inline-block text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase border-b border-[#0a1a3a] hover:border-[#4a90d9] pb-1"
           >
             View Full Collection →
           </Link>

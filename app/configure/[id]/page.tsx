@@ -273,16 +273,16 @@ export default function Configure() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-[#666] tracking-widest text-sm">Entering the atelier...</p>
+      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
+        <p className="text-[#3a5570] tracking-widest text-sm">Entering the atelier...</p>
       </main>
     );
   }
 
   if (!piece) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-[#666]">Piece not found.</p>
+      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
+        <p className="text-[#444]">Piece not found.</p>
       </main>
     );
   }
@@ -290,8 +290,8 @@ export default function Configure() {
   const catConfig = categoryConfig[piece.category];
   if (!catConfig) {
     return (
-      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-[#666]">Configuration not available for this category.</p>
+      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
+        <p className="text-[#444]">Configuration not available for this category.</p>
       </main>
     );
   }
@@ -306,19 +306,19 @@ export default function Configure() {
   const totalPrice = basePrice + modifier * 100;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5]">
+    <main className="min-h-screen bg-[#02040a] text-[#e5e5e5]">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-[#1a1a1a]">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#02040a]/90 backdrop-blur-sm border-b border-[#0a1a3a]">
         <Link
           href={`/piece/${params.id}`}
-          className="text-xs text-[#666] hover:text-[#C5A880] transition-colors tracking-widest uppercase"
+          className="text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase"
         >
           ← Back to Details
         </Link>
-        <span className="text-[#C5A880] font-serif tracking-widest text-sm">THE VAULT</span>
+        <span className="text-[#8ab4e8] font-serif tracking-widest text-sm">THE VAULT</span>
         <button
           onClick={openModal}
-          className="text-xs text-[#C5A880] border border-[#C5A880] px-4 py-2 hover:bg-[#C5A880] hover:text-[#0a0a0a] transition-all tracking-widest uppercase"
+          className="text-xs text-[#4a90d9] border border-[#4a90d9] px-4 py-2 hover:bg-[#4a90d9] hover:text-[#02040a] transition-all tracking-widest uppercase"
         >
           Commission
         </button>
@@ -326,8 +326,8 @@ export default function Configure() {
 
       <div className="pt-20 min-h-screen flex flex-col lg:flex-row">
         {/* Left: Visual */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-[#0d0d0d] relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.03)_0%,transparent_70%)]" />
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-[#02040a] relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,144,217,0.03)_0%,transparent_70%)]" />
           <div className="relative w-full max-w-md aspect-square">
             {piece.category === "ring" ? (
               <RingSVG config={config} />
@@ -338,16 +338,16 @@ export default function Configure() {
         </div>
 
         {/* Right: Controls */}
-        <div className="w-full lg:w-[450px] border-l border-[#1a1a1a] p-8 lg:p-12 overflow-y-auto">
+        <div className="w-full lg:w-[450px] border-l border-[#0a1a3a] p-8 lg:p-12 overflow-y-auto">
           <div className="mb-10">
-            <p className="text-xs text-[#666] tracking-[0.2em] uppercase mb-2">{piece.collection}</p>
-            <h1 className="text-3xl font-serif text-[#C5A880] mb-1">{piece.name}</h1>
-            <p className="text-sm text-[#555]">{catConfig.label}</p>
+            <p className="text-xs text-[#3a5570] tracking-[0.2em] uppercase mb-2">{piece.collection}</p>
+            <h1 className="text-3xl font-serif text-[#8ab4e8] mb-1">{piece.name}</h1>
+            <p className="text-sm text-[#3a5570]">{catConfig.label}</p>
           </div>
 
           {catConfig.options.map((opt) => (
             <div key={opt.key} className="mb-8">
-              <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">
+              <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-3">
                 {opt.label}
                 {opt.key === "bandWidth" && config[opt.key] ? ` — ${config[opt.key]}mm` : ""}
                 {opt.key === "chainLength" && config[opt.key] ? ` — ${config[opt.key]}″` : ""}
@@ -363,7 +363,7 @@ export default function Configure() {
                   step={opt.key === "bandWidth" ? 0.5 : opt.key === "wristSize" ? 0.5 : 1}
                   value={config[opt.key] as number}
                   onChange={(e) => setConfig({ ...config, [opt.key]: parseFloat(e.target.value) })}
-                  className="w-full accent-[#C5A880]"
+                  className="w-full accent-[#4a90d9]"
                 />
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -371,11 +371,10 @@ export default function Configure() {
                     <button
                       key={String(val.value)}
                       onClick={() => setConfig({ ...config, [opt.key]: val.value })}
-                      className={`px-4 py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${
-                        config[opt.key] === val.value
-                          ? "border-[#C5A880] text-[#C5A880] bg-[#C5A880]/10"
-                          : "border-[#222] text-[#666] hover:border-[#444] hover:text-[#888]"
-                      }`}
+                      className={`px-4 py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${config[opt.key] === val.value
+                        ? "border-[#4a90d9] text-[#4a90d9] bg-[#4a90d9]/10"
+                        : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a] hover:text-[#5ba3e8]"
+                        }`}
                     >
                       {val.label}
                     </button>
@@ -387,37 +386,37 @@ export default function Configure() {
 
           {/* Engraving (universal) */}
           <div className="mb-10">
-            <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">Engraving</label>
+            <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-3">Engraving</label>
             <input
               type="text"
               maxLength={20}
               placeholder="Optional"
               value={config.engraving || ""}
               onChange={(e) => setConfig({ ...config, engraving: e.target.value })}
-              className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
+              className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
             />
-            <p className="text-[#444] text-xs mt-1">{(config.engraving || "").length}/20</p>
+            <p className="text-[#1a3a5a] text-xs mt-1">{(config.engraving || "").length}/20</p>
           </div>
 
           {/* Price */}
-          <div className="border-t border-[#222] pt-6 mb-6">
+          <div className="border-t border-[#0a1a3a] pt-6 mb-6">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs text-[#666] tracking-widest uppercase">Base Price</span>
-              <span className="text-sm text-[#888]">
+              <span className="text-xs text-[#3a5570] tracking-widest uppercase">Base Price</span>
+              <span className="text-sm text-[#5a7a9a]">
                 {basePrice === 0 ? "Upon Request" : `$${(basePrice / 100).toLocaleString()}`}
               </span>
             </div>
             {basePrice > 0 && modifier !== 0 && (
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-[#666] tracking-widest uppercase">Configuration</span>
-                <span className={`text-sm ${modifier > 0 ? "text-[#C5A880]" : "text-emerald-400"}`}>
+                <span className="text-xs text-[#3a5570] tracking-widest uppercase">Configuration</span>
+                <span className={`text-sm ${modifier > 0 ? "text-[#4a90d9]" : "text-emerald-400"}`}>
                   {modifier > 0 ? "+" : ""}${modifier.toLocaleString()}
                 </span>
               </div>
             )}
-            <div className="flex justify-between items-center pt-4 border-t border-[#222]">
-              <span className="text-sm text-[#666] tracking-widest uppercase">Total Estimate</span>
-              <span className="text-xl font-serif text-[#C5A880]">
+            <div className="flex justify-between items-center pt-4 border-t border-[#0a1a3a]">
+              <span className="text-sm text-[#3a5570] tracking-widest uppercase">Total Estimate</span>
+              <span className="text-xl font-serif text-[#8ab4e8]">
                 {totalPrice === 0 ? "Upon Request" : `$${(totalPrice / 100).toLocaleString()}`}
               </span>
             </div>
@@ -425,7 +424,7 @@ export default function Configure() {
 
           <button
             onClick={openModal}
-            className="w-full py-4 bg-[#C5A880] text-[#0a0a0a] hover:bg-[#b89a70] transition-colors tracking-[0.2em] text-sm uppercase font-medium"
+            className="w-full py-4 bg-[#4a90d9] text-[#02040a] hover:bg-[#5ba3e8] transition-colors tracking-[0.2em] text-sm uppercase font-medium"
           >
             Commission This Configuration
           </button>
@@ -435,27 +434,25 @@ export default function Configure() {
       {/* Commission Modal with smooth animation */}
       {showCommission && (
         <div
-          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${
-            modalState === "entering" || modalState === "visible"
-              ? "bg-black/80 backdrop-blur-sm"
-              : "bg-black/0 backdrop-blur-none"
-          }`}
+          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${modalState === "entering" || modalState === "visible"
+            ? "bg-black/80 backdrop-blur-sm"
+            : "bg-black/0 backdrop-blur-none"
+            }`}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
         >
           <div
-            className={`bg-[#0a0a0a] border border-[#222] max-w-md w-full p-8 relative transition-all duration-300 ${
-              modalState === "entering"
-                ? "opacity-0 scale-95"
-                : modalState === "visible"
+            className={`bg-[#02040a] border border-[#0a1a3a] max-w-md w-full p-8 relative transition-all duration-300 ${modalState === "entering"
+              ? "opacity-0 scale-95"
+              : modalState === "visible"
                 ? "opacity-100 scale-100"
                 : "opacity-0 scale-95"
-            }`}
+              }`}
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-[#666] hover:text-[#C5A880] transition-colors text-xl"
+              className="absolute top-4 right-4 text-[#3a5570] hover:text-[#8ab4e8] transition-colors text-xl"
             >
               ×
             </button>
@@ -579,22 +576,22 @@ function GenericPreview({ piece, config, category }: { piece: any; config: Confi
       {imageUrl ? (
         <div className="relative w-64 h-64 md:w-80 md:h-80">
           <img src={imageUrl} alt={piece.name} className="w-full h-full object-cover opacity-80" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent" />
         </div>
       ) : (
-        <div className="w-64 h-64 border border-[#222] flex items-center justify-center">
-          <span className="text-[#333] text-xs tracking-widest">NO PREVIEW</span>
+        <div className="w-64 h-64 border border-[#0a1a3a] flex items-center justify-center">
+          <span className="text-[#1a3a5a] text-xs tracking-widest">NO PREVIEW</span>
         </div>
       )}
 
       <div className="mt-8 space-y-2 text-center">
-        <p className="text-[10px] text-[#666] tracking-[0.2em] uppercase">{category} Configuration</p>
+        <p className="text-[10px] text-[#3a5570] tracking-[0.2em] uppercase">{category} Configuration</p>
         {Object.entries(config).map(([key, val]) => {
           if (key === "engraving" && !val) return null;
           return (
-            <p key={key} className="text-xs text-[#888]">
-              <span className="text-[#555] capitalize">{key.replace(/([A-Z])/g, " $1")}: </span>
-              <span className="text-[#C5A880]">{val}</span>
+            <p key={key} className="text-xs text-[#5a7a9a]">
+              <span className="text-[#3a5570] capitalize">{key.replace(/([A-Z])/g, " $1")}: </span>
+              <span className="text-[#8ab4e8]">{val}</span>
             </p>
           );
         })}
@@ -660,11 +657,11 @@ function CommissionForm({
   if (formState === "success") {
     return (
       <div className="text-center py-8">
-        <p className="text-[#C5A880] font-serif text-2xl mb-2">Request Received</p>
-        <p className="text-[#888] text-sm mb-6">A master jeweler will contact you within 24 hours.</p>
+        <p className="text-[#8ab4e8] font-serif text-2xl mb-2">Request Received</p>
+        <p className="text-[#5a7a9a] text-sm mb-6">A master jeweler will contact you within 24 hours.</p>
         <button
           onClick={onClose}
-          className="text-xs text-[#666] hover:text-[#C5A880] transition-colors tracking-widest uppercase border-b border-[#333] hover:border-[#C5A880] pb-1"
+          className="text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase border-b border-[#0a1a3a] hover:border-[#4a90d9] pb-1"
         >
           Return to Configuration
         </button>
@@ -674,30 +671,30 @@ function CommissionForm({
 
   return (
     <>
-      <h2 className="text-2xl font-serif text-[#C5A880] mb-1">Commission</h2>
-      <p className="text-sm text-[#666] mb-6">{piece.name}</p>
+      <h2 className="text-2xl font-serif text-[#8ab4e8] mb-1">Commission</h2>
+      <p className="text-sm text-[#3a5570] mb-6">{piece.name}</p>
 
-      <div className="bg-[#111] border border-[#222] p-4 mb-6 text-xs space-y-1.5">
-        <p className="text-[#666] tracking-widest uppercase mb-2">Configuration Summary</p>
+      <div className="bg-[#02040a] border border-[#0a1a3a] p-4 mb-6 text-xs space-y-1.5">
+        <p className="text-[#3a5570] tracking-widest uppercase mb-2">Configuration Summary</p>
         {catConfig.options.map((opt) => {
           const val = config[opt.key];
           const valLabel = opt.values.find((v) => v.value === val)?.label || val;
           return (
             <div key={opt.key} className="flex justify-between">
-              <span className="text-[#555]">{opt.label}</span>
-              <span className="text-[#888]">{valLabel}</span>
+              <span className="text-[#3a5570]">{opt.label}</span>
+              <span className="text-[#5a7a9a]">{valLabel}</span>
             </div>
           );
         })}
         {config.engraving && (
-          <div className="flex justify-between pt-1 border-t border-[#222]">
-            <span className="text-[#555]">Engraving</span>
-            <span className="text-[#888]">&ldquo;{config.engraving}&rdquo;</span>
+          <div className="flex justify-between pt-1 border-t border-[#0a1a3a]">
+            <span className="text-[#3a5570]">Engraving</span>
+            <span className="text-[#5a7a9a]">&ldquo;{config.engraving}&rdquo;</span>
           </div>
         )}
-        <div className="flex justify-between pt-2 border-t border-[#222] mt-1">
-          <span className="text-[#666]">Estimate</span>
-          <span className="text-[#C5A880]">
+        <div className="flex justify-between pt-2 border-t border-[#0a1a3a] mt-1">
+          <span className="text-[#3a5570]">Estimate</span>
+          <span className="text-[#8ab4e8]">
             {totalPrice === 0 ? "Upon Request" : `$${(totalPrice / 100).toLocaleString()}`}
           </span>
         </div>
@@ -709,26 +706,26 @@ function CommissionForm({
           type="text"
           required
           placeholder="Name"
-          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
+          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
         />
         <input
           name="email"
           type="email"
           required
           placeholder="Email"
-          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
+          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
         />
         <textarea
           name="message"
           rows={3}
           placeholder="Additional notes (optional)"
-          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm resize-none"
+          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm resize-none"
         />
         {formState === "error" && <p className="text-red-400 text-xs">{formError}</p>}
         <button
           type="submit"
           disabled={formState === "submitting"}
-          className="w-full py-3 bg-[#C5A880] text-[#0a0a0a] hover:bg-[#b89a70] transition-colors tracking-widest text-sm uppercase disabled:opacity-50"
+          className="w-full py-3 bg-[#4a90d9] text-[#02040a] hover:bg-[#5ba3e8] transition-colors tracking-widest text-sm uppercase disabled:opacity-50"
         >
           {formState === "submitting" ? "Sending..." : "Submit Commission"}
         </button>
