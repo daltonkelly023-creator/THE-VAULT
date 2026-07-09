@@ -62,29 +62,51 @@ export default async function Collection({
         {/* Base gradient — abyssal blue-black */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#02040a] via-[#040818] to-[#02040a]" />
         
-        {/* Subtle depth layers — like ocean zones */}
+        {/* Subtle depth layers */}
         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#061025]/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#010208]/80 to-transparent" />
         
-        {/* Bioluminescent particles — CSS only */}
-        {/* Blue particles — majority, slow drift */}
-        <div className="absolute top-[20%] left-[15%] w-1 h-1 bg-[#4a90d9]/40 rounded-full animate-pulse" style={{ animationDuration: '4s', animationDelay: '0s' }} />
-        <div className="absolute top-[35%] left-[70%] w-1.5 h-1.5 bg-[#5ba3e8]/30 rounded-full animate-pulse" style={{ animationDuration: '6s', animationDelay: '1.5s' }} />
-        <div className="absolute top-[60%] left-[25%] w-0.5 h-0.5 bg-[#3d7bc7]/50 rounded-full animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.8s' }} />
-        <div className="absolute top-[45%] left-[85%] w-1 h-1 bg-[#6bb3f0]/25 rounded-full animate-pulse" style={{ animationDuration: '7s', animationDelay: '2.2s' }} />
-        <div className="absolute top-[75%] left-[45%] w-1.5 h-1.5 bg-[#4a90d9]/35 rounded-full animate-pulse" style={{ animationDuration: '4.5s', animationDelay: '0.3s' }} />
-        <div className="absolute top-[15%] left-[55%] w-0.5 h-0.5 bg-[#5ba3e8]/45 rounded-full animate-pulse" style={{ animationDuration: '5.5s', animationDelay: '3s' }} />
-        <div className="absolute top-[55%] left-[10%] w-1 h-1 bg-[#3d7bc7]/30 rounded-full animate-pulse" style={{ animationDuration: '6.5s', animationDelay: '1.2s' }} />
-        <div className="absolute top-[85%] left-[75%] w-0.5 h-0.5 bg-[#6bb3f0]/40 rounded-full animate-pulse" style={{ animationDuration: '4.2s', animationDelay: '2.8s' }} />
-        <div className="absolute top-[30%] left-[40%] w-1 h-1 bg-[#4a90d9]/20 rounded-full animate-pulse" style={{ animationDuration: '8s', animationDelay: '0.5s' }} />
-        <div className="absolute top-[65%] left-[90%] w-1.5 h-1.5 bg-[#5ba3e8]/35 rounded-full animate-pulse" style={{ animationDuration: '5.2s', animationDelay: '1.8s' }} />
+        {/* BIOLUMINESCENT FIELD — 18 dots, 40% red, random flicker */}
+        {(() => {
+          const particles = [
+            // Blue (60%) — cooler, slower, deeper
+            { top: '15%', left: '12%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', dur: '3.2s', del: '0s' },
+            { top: '22%', left: '78%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', dur: '4.1s', del: '0.7s' },
+            { top: '35%', left: '25%', size: 'w-1.5 h-1.5', color: 'bg-[#3d7bc7]', dur: '2.8s', del: '1.2s' },
+            { top: '18%', left: '55%', size: 'w-0.5 h-0.5', color: 'bg-[#6bb3f0]', dur: '5.3s', del: '0.3s' },
+            { top: '45%', left: '88%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', dur: '3.7s', del: '2.1s' },
+            { top: '62%', left: '15%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', dur: '4.8s', del: '0.9s' },
+            { top: '28%', left: '42%', size: 'w-1 h-1', color: 'bg-[#3d7bc7]', dur: '2.5s', del: '1.8s' },
+            { top: '55%', left: '70%', size: 'w-1.5 h-1.5', color: 'bg-[#6bb3f0]', dur: '3.9s', del: '0.5s' },
+            { top: '72%', left: '35%', size: 'w-0.5 h-0.5', color: 'bg-[#4a90d9]', dur: '5.1s', del: '2.7s' },
+            { top: '38%', left: '92%', size: 'w-1 h-1', color: 'bg-[#5ba3e8]', dur: '2.9s', del: '1.5s' },
+            { top: '82%', left: '60%', size: 'w-0.5 h-0.5', color: 'bg-[#3d7bc7]', dur: '4.4s', del: '0.2s' },
+            
+            // Red (40%) — warmer, faster, more alive
+            { top: '25%', left: '88%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '2.1s', del: '0.4s' },
+            { top: '48%', left: '30%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', dur: '1.8s', del: '1.1s' },
+            { top: '68%', left: '75%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', dur: '2.6s', del: '2.3s' },
+            { top: '12%', left: '45%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '1.9s', del: '0.8s' },
+            { top: '58%', left: '52%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', dur: '2.3s', del: '1.6s' },
+            { top: '85%', left: '20%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', dur: '1.7s', del: '0.1s' },
+            { top: '32%', left: '65%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '2.0s', del: '2.9s' },
+          ];
+
+          return particles.map((p, i) => (
+            <div
+              key={i}
+              className={`absolute ${p.size} ${p.color} rounded-full animate-biolum`}
+              style={{
+                top: p.top,
+                left: p.left,
+                '--flicker-dur': p.dur,
+                '--flicker-del': p.del,
+              } as React.CSSProperties}
+            />
+          ));
+        })()}
         
-        {/* Red particles — rare, like deep-sea creatures */}
-        <div className="absolute top-[25%] left-[80%] w-1 h-1 bg-[#c94040]/50 rounded-full animate-pulse" style={{ animationDuration: '3s', animationDelay: '0.7s' }} />
-        <div className="absolute top-[70%] left-[30%] w-0.5 h-0.5 bg-[#d45555]/40 rounded-full animate-pulse" style={{ animationDuration: '4.8s', animationDelay: '2.5s' }} />
-        <div className="absolute top-[50%] left-[60%] w-1.5 h-1.5 bg-[#b83030]/35 rounded-full animate-pulse" style={{ animationDuration: '3.5s', animationDelay: '1.5s' }} />
-        
-        {/* Subtle light rays from above — like surface filtering down */}
+        {/* Subtle light rays from above */}
         <div className="absolute top-0 left-1/4 w-px h-[300px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
         <div className="absolute top-0 left-1/2 w-px h-[400px] bg-gradient-to-b from-[#5ba3e8]/8 to-transparent" />
         <div className="absolute top-0 left-3/4 w-px h-[250px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
@@ -148,16 +170,16 @@ export default async function Collection({
                   {/* DRAMATIC HOVER CONTAINER */}
                   <div className="relative transition-all duration-500 ease-out group-hover:-translate-y-8">
                     
-                    {/* AMBIENT SHADOW — always there, subtle */}
+                    {/* AMBIENT SHADOW */}
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/60 rounded-full blur-xl" />
                     
                     {/* HOVER SHADOW — expands dramatically */}
                     <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/40 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-2xl group-hover:bg-[#4a90d9]/10" />
 
-                    {/* FLOOR GLOW ON HOVER — bioluminescent pool */}
+                    {/* FLOOR GLOW ON HOVER */}
                     <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 w-40 h-20 bg-gradient-to-t ${colors.glow.replace('shadow-', 'from-').replace('/30', '/20')} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl`} />
 
-                    {/* SPOTLIGHT BEAM ON HOVER — blue-white from above */}
+                    {/* SPOTLIGHT BEAM ON HOVER */}
                     <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700">
                       <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(138,180,232,0.06),transparent)]" />
                     </div>
@@ -178,10 +200,10 @@ export default async function Collection({
                         </div>
                       )}
 
-                      {/* Glass sheen — always */}
+                      {/* Glass sheen */}
                       <div className="absolute inset-0 bg-gradient-to-br from-[#4a90d9]/[0.04] via-transparent to-transparent pointer-events-none" />
                       
-                      {/* Extra sheen on hover — blue tint */}
+                      {/* Extra sheen on hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-[#4a90d9]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     </div>
 
@@ -193,7 +215,7 @@ export default async function Collection({
                     </div>
                   </div>
 
-                  {/* INFO — lifts with the piece, blue-tinted */}
+                  {/* INFO */}
                   <div className="mt-6 text-center transition-all duration-500 group-hover:mt-8">
                     <p className="text-[9px] text-[#1a3a5a] tracking-[0.2em] uppercase mb-1 transition-colors duration-500 group-hover:text-[#3a5570]">{piece.collection}</p>
                     <h3 className="text-[#5a7a9a] font-serif text-sm md:text-base mb-1 transition-all duration-500 group-hover:text-[#8ab4e8] group-hover:tracking-wider">{piece.name}</h3>
