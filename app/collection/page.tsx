@@ -14,12 +14,12 @@ const categories = [
   { key: "watch", label: "Timepieces" },
 ];
 
-const categoryColors: Record<string, { glow: string; shadow: string }> = {
-  ring: { glow: "from-blue-500/20", shadow: "shadow-blue-500/20" },
-  necklace: { glow: "from-amber-500/20", shadow: "shadow-amber-500/20" },
-  bracelet: { glow: "from-emerald-500/20", shadow: "shadow-emerald-500/20" },
-  earring: { glow: "from-rose-500/20", shadow: "shadow-rose-500/20" },
-  watch: { glow: "from-slate-400/20", shadow: "shadow-slate-400/20" },
+const categoryColors: Record<string, { glow: string; text: string }> = {
+  ring: { glow: "shadow-blue-500/30", text: "text-blue-300" },
+  necklace: { glow: "shadow-amber-500/30", text: "text-amber-300" },
+  bracelet: { glow: "shadow-emerald-500/30", text: "text-emerald-300" },
+  earring: { glow: "shadow-rose-500/30", text: "text-rose-300" },
+  watch: { glow: "shadow-slate-400/30", text: "text-slate-300" },
 };
 
 export default async function Collection({
@@ -57,11 +57,24 @@ export default async function Collection({
 
   return (
     <main className="min-h-screen bg-[#0f0d0a] text-[#e5e5e5] relative overflow-hidden">
-      {/* Auction hall background */}
+      {/* ALIVE BACKGROUND */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,rgba(197,168,128,0.02)_1px,transparent_1px)] bg-[length:200px_100%]" />
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#1a1612]/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/40 to-transparent" />
+        {/* Warm ambient glow from above — like gallery track lighting */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(197,168,128,0.06)_0%,transparent_70%)]" />
+        
+        {/* Subtle floor reflection glow */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#1a1209]/40 via-transparent to-transparent" />
+        
+        {/* Wall texture — very subtle vertical grain */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 199px, rgba(197,168,128,0.5) 199px, rgba(197,168,128,0.5) 200px)`
+        }} />
+        
+        {/* Floating dust particles (CSS only) */}
+        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-[#C5A880]/20 rounded-full animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute top-1/3 right-1/3 w-0.5 h-0.5 bg-[#C5A880]/15 rounded-full animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+        <div className="absolute top-2/3 left-1/2 w-1 h-1 bg-[#C5A880]/10 rounded-full animate-pulse" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+        <div className="absolute bottom-1/3 right-1/4 w-0.5 h-0.5 bg-[#C5A880]/20 rounded-full animate-pulse" style={{ animationDuration: '7s', animationDelay: '0.5s' }} />
       </div>
 
       {/* Content */}
@@ -97,57 +110,51 @@ export default async function Collection({
           <p className="text-center text-[#666] py-24">No pieces in this category yet.</p>
         )}
 
-        {/* Gallery Floor — Horizontal Scroll */}
+        {/* Gallery Floor — Horizontal Scroll, ALL SAME SIZE, DRAMATIC HOVER */}
         <div className="flex-1 flex items-center pb-24 px-4">
           <div 
-            className="flex items-end gap-6 md:gap-10 lg:gap-12 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-8 px-4"
+            className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
             style={{ 
               scrollbarWidth: "none",
               msOverflowStyle: "none",
             }}
           >
-            {products?.map((piece, index) => {
+            {products?.map((piece) => {
               const imageUrl = getImageUrl(piece.hero_image_path);
-              const colors = categoryColors[piece.category] || { glow: "from-[#C5A880]/20", shadow: "shadow-[#C5A880]/20" };
-              const total = products.length;
-              const center = Math.floor(total / 2);
-              const distance = Math.abs(index - center);
-              const isCenter = index === center;
-
-              const scale = isCenter ? 1.15 : Math.max(0.7, 1 - distance * 0.15);
-              const translateY = isCenter ? 0 : distance * 15;
-              const brightness = isCenter ? 100 : Math.max(35, 100 - distance * 25);
-              const zIndex = isCenter ? 20 : 20 - distance;
+              const colors = categoryColors[piece.category] || { glow: "shadow-[#C5A880]/20", text: "text-[#C5A880]" };
 
               return (
                 <Link
                   key={piece.id}
                   href={`/piece/${piece.id}`}
-                  className="group relative transition-all duration-700 ease-out flex-shrink-0 snap-center"
-                  style={{
-                    transform: `translateY(${translateY}px) scale(${scale})`,
-                    filter: `brightness(${brightness}%)`,
-                    zIndex,
-                  }}
+                  className="group relative transition-all duration-500 ease-out flex-shrink-0 snap-center"
                 >
-                  {/* The Piece Container */}
-                  <div className="relative transition-all duration-700 ease-out group-hover:-translate-y-6 group-hover:scale-110 group-hover:z-20">
+                  {/* DRAMATIC HOVER CONTAINER */}
+                  <div className="relative transition-all duration-500 ease-out group-hover:-translate-y-8">
                     
-                    {/* Shadow */}
-                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-4 bg-black/60 rounded-full blur-xl transition-all duration-700 group-hover:w-32 group-hover:blur-2xl group-hover:bg-black/40" />
+                    {/* AMBIENT SHADOW — always there, subtle */}
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/50 rounded-full blur-xl" />
+                    
+                    {/* HOVER SHADOW — expands dramatically */}
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/30 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-2xl group-hover:bg-[#C5A880]/10" />
 
-                    {/* Floor glow on hover */}
-                    <div className={`absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-16 bg-gradient-to-t ${colors.glow} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-xl`} />
+                    {/* FLOOR GLOW ON HOVER — warm pool of light */}
+                    <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 w-40 h-20 bg-gradient-to-t ${colors.glow.replace('shadow-', 'from-').replace('/30', '/15')} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl`} />
 
-                    {/* Image */}
-                    <div className={`relative overflow-hidden border border-[#2a2520] group-hover:border-[#C5A880]/30 transition-all duration-700 bg-[#0a0a0a] ${isCenter ? 'w-44 h-56 md:w-52 md:h-68' : 'w-32 h-40 md:w-40 md:h-52'}`}>
+                    {/* SPOTLIGHT BEAM ON HOVER — cone from above */}
+                    <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700">
+                      <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(197,168,128,0.08),transparent)]" />
+                    </div>
+
+                    {/* IMAGE CONTAINER — ALL SAME SIZE */}
+                    <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#2a2520] group-hover:border-[#C5A880]/40 transition-all duration-500 bg-[#0a0a0a] group-hover:shadow-2xl group-hover:shadow-[#C5A880]/10">
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
                           alt={piece.name}
                           fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                          sizes="(max-width: 768px) 160px, 192px"
+                          className="object-cover transition-all duration-700 group-hover:scale-110"
+                          sizes="(max-width: 768px) 176px, (max-width: 1024px) 208px, 224px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -155,19 +162,26 @@ export default async function Collection({
                         </div>
                       )}
 
-                      {/* Glass sheen */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] via-transparent to-transparent pointer-events-none" />
+                      {/* Glass sheen — always */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent pointer-events-none" />
+                      
+                      {/* Extra sheen on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#C5A880]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     </div>
 
-                    {/* Hover glow border */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none shadow-2xl ${colors.shadow}`} />
+                    {/* CATEGORY BADGE — appears on hover */}
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                      <span className={`text-[8px] tracking-[0.3em] uppercase ${colors.text} bg-black/80 px-3 py-1 border border-[#333]`}>
+                        {piece.category}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Info */}
-                  <div className={`mt-6 text-center transition-all duration-700 group-hover:mt-8 ${isCenter ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
-                    <p className="text-[9px] text-[#555] tracking-[0.2em] uppercase mb-1">{piece.collection}</p>
-                    <h3 className="text-[#C5A880] font-serif text-sm md:text-base mb-1 transition-colors duration-700">{piece.name}</h3>
-                    <p className="text-[#444] text-[10px] tracking-widest transition-colors duration-700 group-hover:text-[#666]">
+                  {/* INFO — lifts with the piece */}
+                  <div className="mt-6 text-center transition-all duration-500 group-hover:mt-8">
+                    <p className="text-[9px] text-[#444] tracking-[0.2em] uppercase mb-1 transition-colors duration-500 group-hover:text-[#666]">{piece.collection}</p>
+                    <h3 className="text-[#888] font-serif text-sm md:text-base mb-1 transition-all duration-500 group-hover:text-[#C5A880] group-hover:tracking-wider">{piece.name}</h3>
+                    <p className="text-[#333] text-[10px] tracking-widest transition-colors duration-500 group-hover:text-[#555]">
                       {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
                     </p>
                   </div>
