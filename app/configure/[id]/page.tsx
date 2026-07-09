@@ -11,13 +11,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type ConfigOptions = {
-  metal: "yellow-gold" | "white-gold" | "rose-gold" | "platinum" | "black-rhodium";
-  stoneShape: "round" | "princess" | "oval" | "pear" | "emerald";
-  stoneColor: "clear" | "black" | "blue" | "champagne" | "pink";
-  bandWidth: number;
-  engraving: string;
-};
+type ConfigState = Record<string, any>;
 
 const metalColors: Record<string, string> = {
   "yellow-gold": "#C5A880",
@@ -25,28 +19,219 @@ const metalColors: Record<string, string> = {
   "rose-gold": "#B76E79",
   "platinum": "#D4D4D4",
   "black-rhodium": "#2A2A2A",
+  "sterling-silver": "#C0C0C0",
 };
 
 const stoneColors: Record<string, string> = {
-  clear: "#E8F4F8",
-  black: "#1A1A1A",
-  blue: "#4A90D9",
-  champagne: "#F4E4C1",
-  pink: "#F4C2C2",
+  clear: "#E8F8FF",
+  black: "#0A0A0A",
+  blue: "#1E6FD9",
+  champagne: "#F0D878",
+  pink: "#E878A8",
+  emerald: "#2E8B57",
+  ruby: "#D02020",
+};
+
+interface ConfigOption {
+  key: string;
+  label: string;
+  values: { label: string; value: string | number; price?: number }[];
+}
+
+interface CategoryConfig {
+  label: string;
+  options: ConfigOption[];
+}
+
+const categoryConfig: Record<string, CategoryConfig> = {
+  ring: {
+    label: "Ring Configuration",
+    options: [
+      {
+        key: "metal",
+        label: "Metal",
+        values: [
+          { label: "Yellow Gold", value: "yellow-gold", price: 0 },
+          { label: "White Gold", value: "white-gold", price: 500 },
+          { label: "Rose Gold", value: "rose-gold", price: 300 },
+          { label: "Platinum", value: "platinum", price: 1200 },
+          { label: "Black Rhodium", value: "black-rhodium", price: 800 },
+        ],
+      },
+      {
+        key: "stoneShape",
+        label: "Stone Shape",
+        values: [
+          { label: "Round", value: "round" },
+          { label: "Princess", value: "princess" },
+          { label: "Oval", value: "oval" },
+          { label: "Pear", value: "pear" },
+          { label: "Emerald", value: "emerald" },
+        ],
+      },
+      {
+        key: "stoneColor",
+        label: "Stone",
+        values: [
+          { label: "Diamond", value: "clear", price: 0 },
+          { label: "Black Diamond", value: "black", price: -200 },
+          { label: "Sapphire", value: "blue", price: 1500 },
+          { label: "Champagne", value: "champagne", price: 800 },
+          { label: "Pink Sapphire", value: "pink", price: 2500 },
+        ],
+      },
+      {
+        key: "bandWidth",
+        label: "Band Width",
+        values: [
+          { label: "1.5mm", value: 1.5 },
+          { label: "2mm", value: 2 },
+          { label: "2.5mm", value: 2.5 },
+          { label: "3mm", value: 3 },
+          { label: "4mm", value: 4 },
+          { label: "5mm", value: 5 },
+        ],
+      },
+    ],
+  },
+  necklace: {
+    label: "Necklace Configuration",
+    options: [
+      {
+        key: "metal",
+        label: "Chain Metal",
+        values: [
+          { label: "Yellow Gold", value: "yellow-gold", price: 0 },
+          { label: "White Gold", value: "white-gold", price: 400 },
+          { label: "Rose Gold", value: "rose-gold", price: 250 },
+          { label: "Sterling Silver", value: "sterling-silver", price: -300 },
+        ],
+      },
+      {
+        key: "chainLength",
+        label: "Chain Length",
+        values: [
+          { label: "16″", value: 16 },
+          { label: "18″", value: 18 },
+          { label: "20″", value: 20 },
+          { label: "24″", value: 24 },
+        ],
+      },
+      {
+        key: "clasp",
+        label: "Clasp Type",
+        values: [
+          { label: "Spring Ring", value: "spring-ring" },
+          { label: "Lobster", value: "lobster" },
+          { label: "Box", value: "box" },
+          { label: "Toggle", value: "toggle" },
+        ],
+      },
+    ],
+  },
+  bracelet: {
+    label: "Bracelet Configuration",
+    options: [
+      {
+        key: "metal",
+        label: "Metal",
+        values: [
+          { label: "Yellow Gold", value: "yellow-gold", price: 0 },
+          { label: "White Gold", value: "white-gold", price: 400 },
+          { label: "Rose Gold", value: "rose-gold", price: 250 },
+          { label: "Sterling Silver", value: "sterling-silver", price: -200 },
+        ],
+      },
+      {
+        key: "wristSize",
+        label: "Wrist Size",
+        values: [
+          { label: "6″", value: 6 },
+          { label: "6.5″", value: 6.5 },
+          { label: "7″", value: 7 },
+          { label: "7.5″", value: 7.5 },
+          { label: "8″", value: 8 },
+        ],
+      },
+      {
+        key: "closure",
+        label: "Closure",
+        values: [
+          { label: "Box Clasp", value: "box" },
+          { label: "Toggle", value: "toggle" },
+          { label: "Magnetic", value: "magnetic" },
+        ],
+      },
+    ],
+  },
+  earring: {
+    label: "Earring Configuration",
+    options: [
+      {
+        key: "metal",
+        label: "Metal",
+        values: [
+          { label: "Yellow Gold", value: "yellow-gold", price: 0 },
+          { label: "White Gold", value: "white-gold", price: 300 },
+          { label: "Rose Gold", value: "rose-gold", price: 200 },
+        ],
+      },
+      {
+        key: "backing",
+        label: "Backing",
+        values: [
+          { label: "Push Back", value: "push" },
+          { label: "Screw Back", value: "screw" },
+          { label: "Latch Back", value: "latch" },
+          { label: "Hook", value: "hook" },
+        ],
+      },
+      {
+        key: "stoneSize",
+        label: "Stone Size",
+        values: [
+          { label: "3mm", value: 3 },
+          { label: "4mm", value: 4 },
+          { label: "5mm", value: 5 },
+          { label: "6mm", value: 6 },
+        ],
+      },
+    ],
+  },
+  watch: {
+    label: "Timepiece Configuration",
+    options: [
+      {
+        key: "strapMaterial",
+        label: "Strap",
+        values: [
+          { label: "Leather", value: "leather", price: 0 },
+          { label: "Alligator", value: "alligator", price: 400 },
+          { label: "Metal Bracelet", value: "metal", price: 600 },
+          { label: "Rubber", value: "rubber", price: -100 },
+        ],
+      },
+      {
+        key: "dialColor",
+        label: "Dial Color",
+        values: [
+          { label: "Black", value: "black" },
+          { label: "White", value: "white" },
+          { label: "Blue", value: "blue" },
+          { label: "Champagne", value: "champagne" },
+        ],
+      },
+    ],
+  },
 };
 
 export default function Configure() {
   const params = useParams();
   const [piece, setPiece] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [config, setConfig] = useState<ConfigOptions>({
-    metal: "white-gold",
-    stoneShape: "round",
-    stoneColor: "clear",
-    bandWidth: 2,
-    engraving: "",
-  });
+  const [config, setConfig] = useState<ConfigState>({});
   const [showCommission, setShowCommission] = useState(false);
+  const [modalState, setModalState] = useState<"hidden" | "entering" | "visible" | "exiting">("hidden");
 
   useEffect(() => {
     async function fetchPiece() {
@@ -61,10 +246,35 @@ export default function Configure() {
     fetchPiece();
   }, [params.id]);
 
+  useEffect(() => {
+    if (!piece) return;
+    const cat = categoryConfig[piece.category];
+    if (!cat) return;
+    const defaults: ConfigState = {};
+    cat.options.forEach((opt) => {
+      defaults[opt.key] = opt.values[0].value;
+    });
+    setConfig(defaults);
+  }, [piece]);
+
+  function openModal() {
+    setShowCommission(true);
+    setTimeout(() => setModalState("entering"), 10);
+    setTimeout(() => setModalState("visible"), 300);
+  }
+
+  function closeModal() {
+    setModalState("exiting");
+    setTimeout(() => {
+      setModalState("hidden");
+      setShowCommission(false);
+    }, 300);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-[#666] tracking-widest">Loading...</p>
+        <p className="text-[#666] tracking-widest text-sm">Entering the atelier...</p>
       </main>
     );
   }
@@ -77,24 +287,23 @@ export default function Configure() {
     );
   }
 
-  const metalPriceMod = {
-    "yellow-gold": 0,
-    "white-gold": 500,
-    "rose-gold": 300,
-    "platinum": 1200,
-    "black-rhodium": 800,
-  };
-
-  const stonePriceMod = {
-    clear: 0,
-    black: -200,
-    blue: 1500,
-    champagne: 800,
-    pink: 2500,
-  };
+  const catConfig = categoryConfig[piece.category];
+  if (!catConfig) {
+    return (
+      <main className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <p className="text-[#666]">Configuration not available for this category.</p>
+      </main>
+    );
+  }
 
   const basePrice = piece.price_cents || 0;
-  const totalPrice = basePrice + (metalPriceMod[config.metal] * 100) + (stonePriceMod[config.stoneColor] * 100);
+  let modifier = 0;
+  catConfig.options.forEach((opt) => {
+    const val = config[opt.key];
+    const found = opt.values.find((v) => v.value === val);
+    if (found?.price) modifier += found.price;
+  });
+  const totalPrice = basePrice + modifier * 100;
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5]">
@@ -102,13 +311,13 @@ export default function Configure() {
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#0a0a0a]/90 backdrop-blur-sm border-b border-[#1a1a1a]">
         <Link
           href={`/piece/${params.id}`}
-          className="text-[#666] hover:text-[#C5A880] transition-colors text-sm tracking-widest uppercase"
+          className="text-xs text-[#666] hover:text-[#C5A880] transition-colors tracking-widest uppercase"
         >
           ← Back to Details
         </Link>
-        <span className="text-[#C5A880] font-serif tracking-widest">THE VAULT</span>
+        <span className="text-[#C5A880] font-serif tracking-widest text-sm">THE VAULT</span>
         <button
-          onClick={() => setShowCommission(true)}
+          onClick={openModal}
           className="text-xs text-[#C5A880] border border-[#C5A880] px-4 py-2 hover:bg-[#C5A880] hover:text-[#0a0a0a] transition-all tracking-widest uppercase"
         >
           Commission
@@ -116,77 +325,15 @@ export default function Configure() {
       </div>
 
       <div className="pt-20 min-h-screen flex flex-col lg:flex-row">
-        {/* Left: SVG Ring */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-[#0d0d0d]">
+        {/* Left: Visual */}
+        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-[#0d0d0d] relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,168,128,0.03)_0%,transparent_70%)]" />
           <div className="relative w-full max-w-md aspect-square">
-            <svg viewBox="0 0 400 400" className="w-full h-full">
-              {/* Band */}
-              <ellipse
-                cx="200"
-                cy="280"
-                rx="80"
-                ry="30"
-                fill="none"
-                stroke={metalColors[config.metal]}
-                strokeWidth={config.bandWidth * 3}
-              />
-              <ellipse
-                cx="200"
-                cy="280"
-                rx="80"
-                ry="30"
-                fill="none"
-                stroke={metalColors[config.metal]}
-                strokeWidth={config.bandWidth}
-                opacity="0.3"
-              />
-              
-              {/* Setting/Prongs */}
-              <path
-                d={`M ${200 - 25} ${280 - 80} L ${200 - 15} ${280 - 110} L ${200 + 15} ${280 - 110} L ${200 + 25} ${280 - 80}`}
-                fill="none"
-                stroke={metalColors[config.metal]}
-                strokeWidth="3"
-              />
-              
-              {/* Stone */}
-              {config.stoneShape === "round" && (
-                <circle cx="200" cy="200" r="35" fill={stoneColors[config.stoneColor]} opacity="0.9">
-                  <animate attributeName="opacity" values="0.9;0.7;0.9" dur="3s" repeatCount="indefinite" />
-                </circle>
-              )}
-              {config.stoneShape === "princess" && (
-                <rect x="165" y="165" width="70" height="70" fill={stoneColors[config.stoneColor]} opacity="0.9" />
-              )}
-              {config.stoneShape === "oval" && (
-                <ellipse cx="200" cy="200" rx="45" ry="30" fill={stoneColors[config.stoneColor]} opacity="0.9" />
-              )}
-              {config.stoneShape === "pear" && (
-                <path d="M200,165 Q230,200 200,235 Q170,200 200,165" fill={stoneColors[config.stoneColor]} opacity="0.9" />
-              )}
-              {config.stoneShape === "emerald" && (
-                <rect x="170" y="170" width="60" height="60" rx="5" fill={stoneColors[config.stoneColor]} opacity="0.9" />
-              )}
-
-              {/* Stone highlight */}
-              <ellipse cx="185" cy="185" rx="10" ry="5" fill="white" opacity="0.3" />
-
-              {/* Engraving preview */}
-              {config.engraving && (
-                <text
-                  x="200"
-                  y="320"
-                  textAnchor="middle"
-                  fill={metalColors[config.metal]}
-                  fontSize="8"
-                  opacity="0.6"
-                  fontFamily="serif"
-                  letterSpacing="2"
-                >
-                  {config.engraving}
-                </text>
-              )}
-            </svg>
+            {piece.category === "ring" ? (
+              <RingSVG config={config} />
+            ) : (
+              <GenericPreview piece={piece} config={config} category={piece.category} />
+            )}
           </div>
         </div>
 
@@ -194,100 +341,62 @@ export default function Configure() {
         <div className="w-full lg:w-[450px] border-l border-[#1a1a1a] p-8 lg:p-12 overflow-y-auto">
           <div className="mb-10">
             <p className="text-xs text-[#666] tracking-[0.2em] uppercase mb-2">{piece.collection}</p>
-            <h1 className="text-3xl font-serif text-[#C5A880] mb-2">{piece.name}</h1>
-            <p className="text-sm text-[#666]">Configurator</p>
+            <h1 className="text-3xl font-serif text-[#C5A880] mb-1">{piece.name}</h1>
+            <p className="text-sm text-[#555]">{catConfig.label}</p>
           </div>
 
-          {/* Metal */}
-          <div className="mb-8">
-            <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">Metal</label>
-            <div className="grid grid-cols-5 gap-2">
-              {Object.keys(metalColors).map((metal) => (
-                <button
-                  key={metal}
-                  onClick={() => setConfig({ ...config, metal: metal as any })}
-                  className={`h-10 rounded border-2 transition-all ${
-                    config.metal === metal
-                      ? "border-[#C5A880] scale-110"
-                      : "border-[#333] hover:border-[#666]"
-                  }`}
-                  style={{ backgroundColor: metalColors[metal] }}
-                  title={metal.replace("-", " ")}
+          {catConfig.options.map((opt) => (
+            <div key={opt.key} className="mb-8">
+              <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">
+                {opt.label}
+                {opt.key === "bandWidth" && config[opt.key] ? ` — ${config[opt.key]}mm` : ""}
+                {opt.key === "chainLength" && config[opt.key] ? ` — ${config[opt.key]}″` : ""}
+                {opt.key === "wristSize" && config[opt.key] ? ` — ${config[opt.key]}″` : ""}
+                {opt.key === "stoneSize" && config[opt.key] ? ` — ${config[opt.key]}mm` : ""}
+              </label>
+
+              {opt.key === "bandWidth" || opt.key === "chainLength" || opt.key === "wristSize" || opt.key === "stoneSize" ? (
+                <input
+                  type="range"
+                  min={opt.values[0].value as number}
+                  max={opt.values[opt.values.length - 1].value as number}
+                  step={opt.key === "bandWidth" ? 0.5 : opt.key === "wristSize" ? 0.5 : 1}
+                  value={config[opt.key] as number}
+                  onChange={(e) => setConfig({ ...config, [opt.key]: parseFloat(e.target.value) })}
+                  className="w-full accent-[#C5A880]"
                 />
-              ))}
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {opt.values.map((val) => (
+                    <button
+                      key={String(val.value)}
+                      onClick={() => setConfig({ ...config, [opt.key]: val.value })}
+                      className={`px-4 py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${
+                        config[opt.key] === val.value
+                          ? "border-[#C5A880] text-[#C5A880] bg-[#C5A880]/10"
+                          : "border-[#222] text-[#666] hover:border-[#444] hover:text-[#888]"
+                      }`}
+                    >
+                      {val.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <p className="text-xs text-[#888] mt-2 capitalize">{config.metal.replace("-", " ")}</p>
-          </div>
+          ))}
 
-          {/* Stone Shape */}
-          <div className="mb-8">
-            <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">Stone Shape</label>
-            <div className="flex gap-2">
-              {["round", "princess", "oval", "pear", "emerald"].map((shape) => (
-                <button
-                  key={shape}
-                  onClick={() => setConfig({ ...config, stoneShape: shape as any })}
-                  className={`px-3 py-2 text-xs tracking-widest uppercase border transition-all ${
-                    config.stoneShape === shape
-                      ? "border-[#C5A880] text-[#C5A880]"
-                      : "border-[#333] text-[#666] hover:border-[#666]"
-                  }`}
-                >
-                  {shape}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Stone Color */}
-          <div className="mb-8">
-            <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">Stone Color</label>
-            <div className="flex gap-2">
-              {Object.keys(stoneColors).map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setConfig({ ...config, stoneColor: color as any })}
-                  className={`w-10 h-10 rounded-full border-2 transition-all ${
-                    config.stoneColor === color
-                      ? "border-[#C5A880] scale-110"
-                      : "border-[#333] hover:border-[#666]"
-                  }`}
-                  style={{ backgroundColor: stoneColors[color] }}
-                  title={color}
-                />
-              ))}
-            </div>
-            <p className="text-xs text-[#888] mt-2 capitalize">{config.stoneColor}</p>
-          </div>
-
-          {/* Band Width */}
-          <div className="mb-8">
-            <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">
-              Band Width: {config.bandWidth}mm
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              step="0.5"
-              value={config.bandWidth}
-              onChange={(e) => setConfig({ ...config, bandWidth: parseFloat(e.target.value) })}
-              className="w-full accent-[#C5A880]"
-            />
-          </div>
-
-          {/* Engraving */}
+          {/* Engraving (universal) */}
           <div className="mb-10">
             <label className="block text-xs text-[#666] tracking-widest uppercase mb-3">Engraving</label>
             <input
               type="text"
               maxLength={20}
               placeholder="Optional"
-              value={config.engraving}
+              value={config.engraving || ""}
               onChange={(e) => setConfig({ ...config, engraving: e.target.value })}
               className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
             />
-            <p className="text-[#444] text-xs mt-1">{config.engraving.length}/20</p>
+            <p className="text-[#444] text-xs mt-1">{(config.engraving || "").length}/20</p>
           </div>
 
           {/* Price */}
@@ -298,11 +407,11 @@ export default function Configure() {
                 {basePrice === 0 ? "Upon Request" : `$${(basePrice / 100).toLocaleString()}`}
               </span>
             </div>
-            {basePrice > 0 && (
+            {basePrice > 0 && modifier !== 0 && (
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs text-[#666] tracking-widest uppercase">Configuration</span>
-                <span className="text-sm text-[#C5A880]">
-                  +${((metalPriceMod[config.metal] + stonePriceMod[config.stoneColor])).toLocaleString()}
+                <span className={`text-sm ${modifier > 0 ? "text-[#C5A880]" : "text-emerald-400"}`}>
+                  {modifier > 0 ? "+" : ""}${modifier.toLocaleString()}
                 </span>
               </div>
             )}
@@ -315,7 +424,7 @@ export default function Configure() {
           </div>
 
           <button
-            onClick={() => setShowCommission(true)}
+            onClick={openModal}
             className="w-full py-4 bg-[#C5A880] text-[#0a0a0a] hover:bg-[#b89a70] transition-colors tracking-[0.2em] text-sm uppercase font-medium"
           >
             Commission This Configuration
@@ -323,27 +432,188 @@ export default function Configure() {
         </div>
       </div>
 
-      {/* Commission Modal */}
+      {/* Commission Modal with smooth animation */}
       {showCommission && (
-        <CommissionModal
-          piece={piece}
-          config={config}
-          totalPrice={totalPrice}
-          onClose={() => setShowCommission(false)}
-        />
+        <div
+          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${
+            modalState === "entering" || modalState === "visible"
+              ? "bg-black/80 backdrop-blur-sm"
+              : "bg-black/0 backdrop-blur-none"
+          }`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeModal();
+          }}
+        >
+          <div
+            className={`bg-[#0a0a0a] border border-[#222] max-w-md w-full p-8 relative transition-all duration-300 ${
+              modalState === "entering"
+                ? "opacity-0 scale-95"
+                : modalState === "visible"
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-95"
+            }`}
+          >
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-[#666] hover:text-[#C5A880] transition-colors text-xl"
+            >
+              ×
+            </button>
+
+            <CommissionForm piece={piece} config={config} catConfig={catConfig} totalPrice={totalPrice} onClose={closeModal} />
+          </div>
+        </div>
       )}
     </main>
   );
 }
 
-function CommissionModal({
+/* ---------- SVG RING WITH GRADIENTS ---------- */
+function RingSVG({ config }: { config: ConfigState }) {
+  const metal = metalColors[config.metal as string] || "#C5A880";
+  const stone = stoneColors[config.stoneColor as string] || "#E8F8FF";
+  const shape = config.stoneShape as string;
+  const width = (config.bandWidth as number) || 2;
+
+  return (
+    <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-2xl">
+      <defs>
+        <radialGradient id="metalGrad" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stopColor={metal} stopOpacity="0.9" />
+          <stop offset="50%" stopColor={metal} stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#1a1a1a" stopOpacity="0.4" />
+        </radialGradient>
+        <radialGradient id="stoneGrad" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
+          <stop offset="40%" stopColor={stone} stopOpacity="0.95" />
+          <stop offset="100%" stopColor={stone} stopOpacity="0.6" />
+        </radialGradient>
+        <linearGradient id="bandShine" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+          <stop offset="50%" stopColor="transparent" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Band - back half */}
+      <ellipse cx="200" cy="280" rx="80" ry="28" fill="none" stroke="url(#metalGrad)" strokeWidth={width * 3} opacity="0.4" />
+
+      {/* Prongs */}
+      <path d="M175 200 L185 170 L215 170 L225 200" fill="none" stroke={metal} strokeWidth="3" />
+      <path d="M170 210 L180 180 L220 180 L230 210" fill="none" stroke={metal} strokeWidth="2" opacity="0.5" />
+
+      {/* Stone */}
+      {shape === "round" && (
+        <g>
+          <circle cx="200" cy="185" r="38" fill="url(#stoneGrad)" filter="url(#glow)" />
+          <circle cx="200" cy="185" r="30" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+          <circle cx="200" cy="185" r="20" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+          <ellipse cx="185" cy="170" rx="12" ry="6" fill="white" opacity="0.25" />
+        </g>
+      )}
+      {shape === "princess" && (
+        <g>
+          <rect x="162" y="147" width="76" height="76" fill="url(#stoneGrad)" filter="url(#glow)" />
+          <rect x="170" y="155" width="60" height="60" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+          <rect x="178" y="163" width="44" height="44" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+          <polygon points="200,155 230,185 200,215 170,185" fill="white" opacity="0.15" />
+        </g>
+      )}
+      {shape === "oval" && (
+        <g>
+          <ellipse cx="200" cy="185" rx="50" ry="32" fill="url(#stoneGrad)" filter="url(#glow)" />
+          <ellipse cx="200" cy="185" rx="40" ry="24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+          <ellipse cx="200" cy="185" rx="28" ry="16" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+          <ellipse cx="185" cy="170" rx="14" ry="6" fill="white" opacity="0.25" />
+        </g>
+      )}
+      {shape === "pear" && (
+        <g>
+          <path d="M200,150 Q240,185 200,220 Q160,185 200,150" fill="url(#stoneGrad)" filter="url(#glow)" />
+          <path d="M200,160 Q230,185 200,210 Q170,185 200,160" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+          <ellipse cx="190" cy="165" rx="10" ry="5" fill="white" opacity="0.25" />
+        </g>
+      )}
+      {shape === "emerald" && (
+        <g>
+          <rect x="165" y="150" width="70" height="70" rx="8" fill="url(#stoneGrad)" filter="url(#glow)" />
+          <rect x="173" y="158" width="54" height="54" rx="4" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5" />
+          <rect x="181" y="166" width="38" height="38" rx="2" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+          <polygon points="200,158 220,185 200,212 180,185" fill="white" opacity="0.15" />
+        </g>
+      )}
+
+      {/* Band - front half */}
+      <ellipse cx="200" cy="280" rx="80" ry="28" fill="none" stroke="url(#metalGrad)" strokeWidth={width * 3} />
+      <ellipse cx="200" cy="280" rx="80" ry="28" fill="none" stroke="url(#bandShine)" strokeWidth={width * 3} opacity="0.6" />
+
+      {/* Engraving */}
+      {config.engraving && (
+        <text x="200" y="320" textAnchor="middle" fill={metal} fontSize="8" opacity="0.5" fontFamily="serif" letterSpacing="2">
+          {config.engraving}
+        </text>
+      )}
+    </svg>
+  );
+}
+
+/* ---------- GENERIC PREVIEW FOR NON-RINGS ---------- */
+function GenericPreview({ piece, config, category }: { piece: any; config: ConfigState; category: string }) {
+  const getImageUrl = (path: string) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${path}`;
+  };
+
+  const imageUrl = getImageUrl(piece.hero_image_path);
+
+  return (
+    <div className="relative w-full h-full flex flex-col items-center justify-center">
+      {imageUrl ? (
+        <div className="relative w-64 h-64 md:w-80 md:h-80">
+          <img src={imageUrl} alt={piece.name} className="w-full h-full object-cover opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-transparent" />
+        </div>
+      ) : (
+        <div className="w-64 h-64 border border-[#222] flex items-center justify-center">
+          <span className="text-[#333] text-xs tracking-widest">NO PREVIEW</span>
+        </div>
+      )}
+
+      <div className="mt-8 space-y-2 text-center">
+        <p className="text-[10px] text-[#666] tracking-[0.2em] uppercase">{category} Configuration</p>
+        {Object.entries(config).map(([key, val]) => {
+          if (key === "engraving" && !val) return null;
+          return (
+            <p key={key} className="text-xs text-[#888]">
+              <span className="text-[#555] capitalize">{key.replace(/([A-Z])/g, " $1")}: </span>
+              <span className="text-[#C5A880]">{val}</span>
+            </p>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- COMMISSION FORM ---------- */
+function CommissionForm({
   piece,
   config,
+  catConfig,
   totalPrice,
   onClose,
 }: {
   piece: any;
-  config: ConfigOptions;
+  config: ConfigState;
+  catConfig: CategoryConfig;
   totalPrice: number;
   onClose: () => void;
 }) {
@@ -355,10 +625,19 @@ function CommissionModal({
     setFormState("submitting");
 
     const formData = new FormData(e.currentTarget);
+    const configLines = Object.entries(config)
+      .filter(([k, v]) => k !== "engraving" || v)
+      .map(([k, v]) => {
+        const opt = catConfig.options.find((o) => o.key === k);
+        const valLabel = opt?.values.find((v2) => v2.value === v)?.label || v;
+        return `${opt?.label || k}: ${valLabel}`;
+      })
+      .join("\n");
+
     const data = {
       name: formData.get("name"),
       email: formData.get("email"),
-      message: `Configuration Request:\nMetal: ${config.metal}\nStone: ${config.stoneShape} ${config.stoneColor}\nBand: ${config.bandWidth}mm\nEngraving: ${config.engraving || "None"}\n\n${formData.get("message") || ""}`,
+      message: `Configuration Request for ${piece.name}\n\n${configLines}\n${config.engraving ? `Engraving: "${config.engraving}"\n` : ""}\n\nAdditional notes:\n${formData.get("message") || "None"}`,
       pieceName: `${piece.name} (Custom Configuration)`,
       collection: piece.collection,
     };
@@ -378,70 +657,82 @@ function CommissionModal({
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-[#0a0a0a] border border-[#222] max-w-md w-full p-8 relative">
+  if (formState === "success") {
+    return (
+      <div className="text-center py-8">
+        <p className="text-[#C5A880] font-serif text-2xl mb-2">Request Received</p>
+        <p className="text-[#888] text-sm mb-6">A master jeweler will contact you within 24 hours.</p>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#666] hover:text-[#C5A880] transition-colors text-xl"
+          className="text-xs text-[#666] hover:text-[#C5A880] transition-colors tracking-widest uppercase border-b border-[#333] hover:border-[#C5A880] pb-1"
         >
-          ×
+          Return to Configuration
         </button>
-
-        {formState === "success" ? (
-          <div className="text-center py-8">
-            <p className="text-[#C5A880] font-serif text-2xl mb-2">Request Received</p>
-            <p className="text-[#888] text-sm">A master jeweler will contact you within 24 hours.</p>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-2xl font-serif text-[#C5A880] mb-2">Commission</h2>
-            <p className="text-sm text-[#666] mb-6">{piece.name}</p>
-
-            <div className="bg-[#111] border border-[#222] p-4 mb-6 text-xs space-y-1">
-              <p className="text-[#666]">Configuration:</p>
-              <p className="text-[#888]">Metal: {config.metal.replace("-", " ")}</p>
-              <p className="text-[#888]">Stone: {config.stoneShape} {config.stoneColor}</p>
-              <p className="text-[#888]">Band: {config.bandWidth}mm</p>
-              {config.engraving && <p className="text-[#888]">Engraving: "{config.engraving}"</p>}
-              <p className="text-[#C5A880] pt-2 border-t border-[#222]">
-                {totalPrice === 0 ? "Price Upon Request" : `Estimate: $${(totalPrice / 100).toLocaleString()}`}
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                name="name"
-                type="text"
-                required
-                placeholder="Name"
-                className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
-              />
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email"
-                className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
-              />
-              <textarea
-                name="message"
-                rows={3}
-                placeholder="Additional notes (optional)"
-                className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm resize-none"
-              />
-              {formState === "error" && <p className="text-red-400 text-xs">{formError}</p>}
-              <button
-                type="submit"
-                disabled={formState === "submitting"}
-                className="w-full py-3 bg-[#C5A880] text-[#0a0a0a] hover:bg-[#b89a70] transition-colors tracking-widest text-sm uppercase disabled:opacity-50"
-              >
-                {formState === "submitting" ? "Sending..." : "Submit Commission"}
-              </button>
-            </form>
-          </>
-        )}
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <>
+      <h2 className="text-2xl font-serif text-[#C5A880] mb-1">Commission</h2>
+      <p className="text-sm text-[#666] mb-6">{piece.name}</p>
+
+      <div className="bg-[#111] border border-[#222] p-4 mb-6 text-xs space-y-1.5">
+        <p className="text-[#666] tracking-widest uppercase mb-2">Configuration Summary</p>
+        {catConfig.options.map((opt) => {
+          const val = config[opt.key];
+          const valLabel = opt.values.find((v) => v.value === val)?.label || val;
+          return (
+            <div key={opt.key} className="flex justify-between">
+              <span className="text-[#555]">{opt.label}</span>
+              <span className="text-[#888]">{valLabel}</span>
+            </div>
+          );
+        })}
+        {config.engraving && (
+          <div className="flex justify-between pt-1 border-t border-[#222]">
+            <span className="text-[#555]">Engraving</span>
+            <span className="text-[#888]">&ldquo;{config.engraving}&rdquo;</span>
+          </div>
+        )}
+        <div className="flex justify-between pt-2 border-t border-[#222] mt-1">
+          <span className="text-[#666]">Estimate</span>
+          <span className="text-[#C5A880]">
+            {totalPrice === 0 ? "Upon Request" : `$${(totalPrice / 100).toLocaleString()}`}
+          </span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          name="name"
+          type="text"
+          required
+          placeholder="Name"
+          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
+        />
+        <input
+          name="email"
+          type="email"
+          required
+          placeholder="Email"
+          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm"
+        />
+        <textarea
+          name="message"
+          rows={3}
+          placeholder="Additional notes (optional)"
+          className="w-full bg-[#111] border border-[#222] px-4 py-3 text-[#e5e5e5] focus:border-[#C5A880] focus:outline-none transition-colors text-sm resize-none"
+        />
+        {formState === "error" && <p className="text-red-400 text-xs">{formError}</p>}
+        <button
+          type="submit"
+          disabled={formState === "submitting"}
+          className="w-full py-3 bg-[#C5A880] text-[#0a0a0a] hover:bg-[#b89a70] transition-colors tracking-widest text-sm uppercase disabled:opacity-50"
+        >
+          {formState === "submitting" ? "Sending..." : "Submit Commission"}
+        </button>
+      </form>
+    </>
   );
 }

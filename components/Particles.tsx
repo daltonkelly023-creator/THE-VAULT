@@ -19,29 +19,24 @@ export default function Particles() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas!.getContext("2d");
     if (!ctx) return;
 
     let animationId: number;
     let particles: Particle[] = [];
 
     function resize() {
-      const parent = canvas!.parentElement;
-      if (!parent) return;
-      canvas!.width = parent.clientWidth;
-      canvas!.height = parent.clientHeight;
+      canvas!.width = window.innerWidth;
+      canvas!.height = window.innerHeight;
     }
 
     function createParticle(): Particle {
-      const parent = canvas!.parentElement;
-      const h = parent ? parent.clientHeight : canvas!.height;
-      const w = parent ? parent.clientWidth : canvas!.width;
       return {
-        x: Math.random() * w,
-        y: h + 10,
+        x: Math.random() * canvas!.width,
+        y: canvas!.height + Math.random() * 50, // Start below screen
         size: Math.random() * 2 + 0.5,
         speedY: Math.random() * 0.5 + 0.2,
-        opacity: Math.random() * 0.4 + 0.1,
+        opacity: 0,
         fadeSpeed: Math.random() * 0.002 + 0.001,
       };
     }
@@ -50,31 +45,34 @@ export default function Particles() {
       particles = [];
       for (let i = 0; i < 60; i++) {
         const p = createParticle();
-        const parent = canvas!.parentElement;
-        p.y = Math.random() * (parent ? parent.clientHeight : canvas!.height);
+        // Spread them vertically so they don't all appear at once
+        p.y = canvas!.height + Math.random() * 300;
+        p.opacity = Math.random() * 0.3;
         particles.push(p);
       }
     }
 
     function animate() {
-      const parent = canvas!.parentElement;
-      const w = parent ? parent.clientWidth : canvas!.width;
-      const h = parent ? parent.clientHeight : canvas!.height;
-      
-      ctx!.clearRect(0, 0, w, h);
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
       particles.forEach((p, i) => {
         p.y -= p.speedY;
-        p.opacity -= p.fadeSpeed;
 
-        if (p.opacity <= 0 || p.y < -10) {
+        // Fade in as they rise from bottom, fade out as they reach top
+        if (p.y > canvas!.height - 100) {
+          p.opacity += p.fadeSpeed * 2;
+        } else if (p.y < 100) {
+          p.opacity -= p.fadeSpeed * 3;
+        }
+
+        if (p.opacity <= 0 || p.y < -20) {
           particles[i] = createParticle();
           return;
         }
 
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(197, 168, 128, ${p.opacity})`;
+        ctx!.fillStyle = `rgba(197, 168, 128, ${Math.min(p.opacity, 0.4)})`;
         ctx!.fill();
       });
 
@@ -96,7 +94,7 @@ export default function Particles() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none"
       style={{ zIndex: 1 }}
     />
   );

@@ -1,3 +1,4 @@
+// app/collection/page.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
@@ -58,11 +59,8 @@ export default async function Collection({
     <main className="min-h-screen bg-[#0f0d0a] text-[#e5e5e5] relative overflow-hidden">
       {/* Auction hall background */}
       <div className="fixed inset-0 pointer-events-none">
-        {/* Wall paneling */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,rgba(197,168,128,0.02)_1px,transparent_1px)] bg-[length:200px_100%]" />
-        {/* Ceiling wash */}
         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#1a1612]/30 to-transparent" />
-        {/* Floor shadow */}
         <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
@@ -99,36 +97,50 @@ export default async function Collection({
           <p className="text-center text-[#666] py-24">No pieces in this category yet.</p>
         )}
 
-        {/* Gallery Floor */}
-        <div className="flex-1 flex items-center justify-center pb-24 px-4">
-          <div className="flex items-center justify-center gap-4 md:gap-8 lg:gap-12 max-w-6xl mx-auto" style={{ perspective: "1200px" }}>
+        {/* Gallery Floor — Horizontal Scroll */}
+        <div className="flex-1 flex items-center pb-24 px-4">
+          <div 
+            className="flex items-end gap-6 md:gap-10 lg:gap-12 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-8 px-4"
+            style={{ 
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             {products?.map((piece, index) => {
               const imageUrl = getImageUrl(piece.hero_image_path);
               const colors = categoryColors[piece.category] || { glow: "from-[#C5A880]/20", shadow: "shadow-[#C5A880]/20" };
               const total = products.length;
               const center = Math.floor(total / 2);
               const distance = Math.abs(index - center);
+              const isCenter = index === center;
+
+              const scale = isCenter ? 1.15 : Math.max(0.7, 1 - distance * 0.15);
+              const translateY = isCenter ? 0 : distance * 15;
+              const brightness = isCenter ? 100 : Math.max(35, 100 - distance * 25);
+              const zIndex = isCenter ? 20 : 20 - distance;
 
               return (
                 <Link
                   key={piece.id}
                   href={`/piece/${piece.id}`}
-                  className="group relative transition-all duration-700 ease-out"
+                  className="group relative transition-all duration-700 ease-out flex-shrink-0 snap-center"
                   style={{
-                    transformStyle: "preserve-3d",
+                    transform: `translateY(${translateY}px) scale(${scale})`,
+                    filter: `brightness(${brightness}%)`,
+                    zIndex,
                   }}
                 >
                   {/* The Piece Container */}
                   <div className="relative transition-all duration-700 ease-out group-hover:-translate-y-6 group-hover:scale-110 group-hover:z-20">
                     
-                    {/* Shadow (invisible plinth replacement) */}
+                    {/* Shadow */}
                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-4 bg-black/60 rounded-full blur-xl transition-all duration-700 group-hover:w-32 group-hover:blur-2xl group-hover:bg-black/40" />
 
                     {/* Floor glow on hover */}
                     <div className={`absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-16 bg-gradient-to-t ${colors.glow} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-xl`} />
 
                     {/* Image */}
-                    <div className="relative w-40 h-52 md:w-48 md:h-64 overflow-hidden border border-[#2a2520] group-hover:border-[#C5A880]/30 transition-all duration-700 bg-[#0a0a0a]">
+                    <div className={`relative overflow-hidden border border-[#2a2520] group-hover:border-[#C5A880]/30 transition-all duration-700 bg-[#0a0a0a] ${isCenter ? 'w-44 h-56 md:w-52 md:h-68' : 'w-32 h-40 md:w-40 md:h-52'}`}>
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
@@ -151,8 +163,8 @@ export default async function Collection({
                     <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none shadow-2xl ${colors.shadow}`} />
                   </div>
 
-                  {/* Info - shifts up on hover */}
-                  <div className="mt-6 text-center transition-all duration-700 group-hover:mt-8">
+                  {/* Info */}
+                  <div className={`mt-6 text-center transition-all duration-700 group-hover:mt-8 ${isCenter ? 'opacity-100' : 'opacity-40 group-hover:opacity-70'}`}>
                     <p className="text-[9px] text-[#555] tracking-[0.2em] uppercase mb-1">{piece.collection}</p>
                     <h3 className="text-[#C5A880] font-serif text-sm md:text-base mb-1 transition-colors duration-700">{piece.name}</h3>
                     <p className="text-[#444] text-[10px] tracking-widest transition-colors duration-700 group-hover:text-[#666]">
