@@ -66,30 +66,30 @@ export default async function Collection({
         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#061025]/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#010208]/80 to-transparent" />
         
-        {/* BIOLUMINESCENT FIELD — 18 dots, 40% red, random flicker */}
+        {/* BIOLUMINESCENT FIELD — 18 dots, 40% red, slow breathing drift */}
         {(() => {
           const particles = [
-            // Blue (60%) — cooler, slower, deeper
-            { top: '15%', left: '12%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', dur: '3.2s', del: '0s' },
-            { top: '22%', left: '78%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', dur: '4.1s', del: '0.7s' },
-            { top: '35%', left: '25%', size: 'w-1.5 h-1.5', color: 'bg-[#3d7bc7]', dur: '2.8s', del: '1.2s' },
-            { top: '18%', left: '55%', size: 'w-0.5 h-0.5', color: 'bg-[#6bb3f0]', dur: '5.3s', del: '0.3s' },
-            { top: '45%', left: '88%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', dur: '3.7s', del: '2.1s' },
-            { top: '62%', left: '15%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', dur: '4.8s', del: '0.9s' },
-            { top: '28%', left: '42%', size: 'w-1 h-1', color: 'bg-[#3d7bc7]', dur: '2.5s', del: '1.8s' },
-            { top: '55%', left: '70%', size: 'w-1.5 h-1.5', color: 'bg-[#6bb3f0]', dur: '3.9s', del: '0.5s' },
-            { top: '72%', left: '35%', size: 'w-0.5 h-0.5', color: 'bg-[#4a90d9]', dur: '5.1s', del: '2.7s' },
-            { top: '38%', left: '92%', size: 'w-1 h-1', color: 'bg-[#5ba3e8]', dur: '2.9s', del: '1.5s' },
-            { top: '82%', left: '60%', size: 'w-0.5 h-0.5', color: 'bg-[#3d7bc7]', dur: '4.4s', del: '0.2s' },
+            // Blue (60%) — deep, slow, wide drift
+            { top: '15%', left: '12%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', breathe: '5.2s', bDel: '0s', drift: '14s', dDel: '0s' },
+            { top: '22%', left: '78%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', breathe: '6.8s', bDel: '1.2s', drift: '18s', dDel: '3s' },
+            { top: '35%', left: '25%', size: 'w-1.5 h-1.5', color: 'bg-[#3d7bc7]', breathe: '4.5s', bDel: '2.1s', drift: '12s', dDel: '1s' },
+            { top: '18%', left: '55%', size: 'w-0.5 h-0.5', color: 'bg-[#6bb3f0]', breathe: '7.3s', bDel: '0.7s', drift: '20s', dDel: '5s' },
+            { top: '45%', left: '88%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', breathe: '5.8s', bDel: '3.4s', drift: '15s', dDel: '2s' },
+            { top: '62%', left: '15%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', breathe: '6.2s', bDel: '1.8s', drift: '16s', dDel: '4s' },
+            { top: '28%', left: '42%', size: 'w-1 h-1', color: 'bg-[#3d7bc7]', breathe: '4.9s', bDel: '0.3s', drift: '13s', dDel: '6s' },
+            { top: '55%', left: '70%', size: 'w-1.5 h-1.5', color: 'bg-[#6bb3f0]', breathe: '5.5s', bDel: '2.7s', drift: '17s', dDel: '1.5s' },
+            { top: '72%', left: '35%', size: 'w-0.5 h-0.5', color: 'bg-[#4a90d9]', breathe: '7.8s', bDel: '4.1s', drift: '22s', dDel: '7s' },
+            { top: '38%', left: '92%', size: 'w-1 h-1', color: 'bg-[#5ba3e8]', breathe: '6.1s', bDel: '1.1s', drift: '14s', dDel: '3.5s' },
+            { top: '82%', left: '60%', size: 'w-0.5 h-0.5', color: 'bg-[#3d7bc7]', breathe: '5.4s', bDel: '3.8s', drift: '19s', dDel: '2.5s' },
             
-            // Red (40%) — warmer, faster, more alive
-            { top: '25%', left: '88%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '2.1s', del: '0.4s' },
-            { top: '48%', left: '30%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', dur: '1.8s', del: '1.1s' },
-            { top: '68%', left: '75%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', dur: '2.6s', del: '2.3s' },
-            { top: '12%', left: '45%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '1.9s', del: '0.8s' },
-            { top: '58%', left: '52%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', dur: '2.3s', del: '1.6s' },
-            { top: '85%', left: '20%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', dur: '1.7s', del: '0.1s' },
-            { top: '32%', left: '65%', size: 'w-1 h-1', color: 'bg-[#c94040]', dur: '2.0s', del: '2.9s' },
+            // Red (40%) — warmer, slightly faster, more erratic
+            { top: '25%', left: '88%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '3.8s', bDel: '0.5s', drift: '11s', dDel: '1s' },
+            { top: '48%', left: '30%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', breathe: '3.2s', bDel: '2.3s', drift: '10s', dDel: '4s' },
+            { top: '68%', left: '75%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', breathe: '4.1s', bDel: '1.5s', drift: '13s', dDel: '2s' },
+            { top: '12%', left: '45%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '3.5s', bDel: '3.1s', drift: '9s', dDel: '5s' },
+            { top: '58%', left: '52%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', breathe: '3.9s', bDel: '0.9s', drift: '12s', dDel: '3s' },
+            { top: '85%', left: '20%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', breathe: '3.3s', bDel: '2.8s', drift: '8s', dDel: '6s' },
+            { top: '32%', left: '65%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '4.4s', bDel: '4.2s', drift: '11s', dDel: '2s' },
           ];
 
           return particles.map((p, i) => (
@@ -99,8 +99,10 @@ export default async function Collection({
               style={{
                 top: p.top,
                 left: p.left,
-                '--flicker-dur': p.dur,
-                '--flicker-del': p.del,
+                '--breathe-dur': p.breathe,
+                '--breathe-del': p.bDel,
+                '--drift-dur': p.drift,
+                '--drift-del': p.dDel,
               } as React.CSSProperties}
             />
           ));
