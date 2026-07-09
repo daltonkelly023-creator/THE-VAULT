@@ -10,6 +10,7 @@ interface Particle {
   speedY: number;
   opacity: number;
   fadeSpeed: number;
+  color: string; // blue or red
 }
 
 export default function Particles() {
@@ -26,27 +27,34 @@ export default function Particles() {
     let particles: Particle[] = [];
 
     function resize() {
-      canvas!.width = window.innerWidth;
-      canvas!.height = window.innerHeight;
+      canvas!.width = canvas!.parentElement?.clientWidth || window.innerWidth;
+      canvas!.height = canvas!.parentElement?.clientHeight || window.innerHeight;
     }
 
     function createParticle(): Particle {
+      // 70% blue, 30% red (like showroom bioluminescence)
+      const isRed = Math.random() < 0.3;
+      const color = isRed 
+        ? `201, 64, 64`   // red bioluminescence
+        : `74, 144, 217`; // ocean blue
+      
       return {
         x: Math.random() * canvas!.width,
-        y: canvas!.height + Math.random() * 50, // Start below screen
+        y: canvas!.height + Math.random() * 100, // Start below parent
         size: Math.random() * 2 + 0.5,
         speedY: Math.random() * 0.5 + 0.2,
         opacity: 0,
         fadeSpeed: Math.random() * 0.002 + 0.001,
+        color,
       };
     }
 
     function init() {
       particles = [];
-      for (let i = 0; i < 60; i++) {
+      // Fewer particles for hero: 30 instead of 60
+      for (let i = 0; i < 30; i++) {
         const p = createParticle();
-        // Spread them vertically so they don't all appear at once
-        p.y = canvas!.height + Math.random() * 300;
+        p.y = canvas!.height + Math.random() * 200;
         p.opacity = Math.random() * 0.3;
         particles.push(p);
       }
@@ -72,7 +80,7 @@ export default function Particles() {
 
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(197, 168, 128, ${Math.min(p.opacity, 0.4)})`;
+        ctx!.fillStyle = `rgba(${p.color}, ${Math.min(p.opacity, 0.4)})`;
         ctx!.fill();
       });
 
@@ -94,7 +102,7 @@ export default function Particles() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
+      className="absolute inset-0 pointer-events-none"
       style={{ zIndex: 1 }}
     />
   );
