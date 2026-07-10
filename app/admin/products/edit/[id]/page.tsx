@@ -9,15 +9,23 @@ export default function EditProduct() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [product, setProduct] = useState<any>(null);
 
   useEffect(() => {
     async function fetchProduct() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("id", params.id)
         .single();
+      
+      if (error || !data) {
+        setError("Product not found");
+        setLoading(false);
+        return;
+      }
+      
       setProduct(data);
       setLoading(false);
     }
@@ -27,25 +35,50 @@ export default function EditProduct() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError("");
 
-    const { error } = await supabase
+    // Validate price is a number
+    const priceCents = parseInt(product.price_cents);
+    if (isNaN(priceCents) || priceCents < 0) {
+      setError("Price must be a valid number");
+      setSaving(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase
       .from("products")
       .update({
         name: product.name,
         story: product.story,
-        price_cents: product.price_cents,
+        price_cents: priceCents,
         is_published: product.is_published,
       })
       .eq("id", params.id);
 
     setSaving(false);
-    if (!error) router.push("/admin/products");
+
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+
+    // Force refresh and redirect
+    router.refresh();
+    router.push("/admin/products");
   }
 
   if (loading) {
     return (
       <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
         <p className="text-[#3a5570] tracking-widest text-sm">Loading...</p>
+      </main>
+    );
+  }
+
+  if (error && !product) {
+    return (
+      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
+        <p className="text-[#c94040]">{error}</p>
       </main>
     );
   }
@@ -72,6 +105,12 @@ export default function EditProduct() {
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-6 border border-[#c94040]/30 bg-[#c94040]/10 px-4 py-3">
+            <p className="text-[#c94040] text-xs tracking-widest">{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-2">Name</label>
@@ -97,10 +136,15 @@ export default function EditProduct() {
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-2">Price (cents)</label>
             <input
               type="number"
+              min="0"
+              step="1"
               value={product.price_cents}
-              onChange={(e) => setProduct({ ...product, price_cents: parseInt(e.target.value) })}
+              onChange={(e) => setProduct({ ...product, price_cents: e.target.value })}
               className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
             />
+            <p className="text-[#1a3a5a] text-[10px] mt-1">
+              Display: ${(parseInt(product.price_cents || 0) / 100).toLocaleString()}
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
