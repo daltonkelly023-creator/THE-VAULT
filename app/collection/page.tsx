@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
+import Skeleton from "@/components/Skeleton";
 
 export const revalidate = 60;
 
@@ -145,93 +146,111 @@ export default async function Collection({
           ))}
         </div>
 
-        {(!products || products.length === 0) && (
-          <p className="text-center text-[#3a5570] py-24">No pieces in this category yet.</p>
-        )}
-
-        {/* Gallery Floor — Horizontal Scroll, MAGNETIC HOVER */}
-        <div className="flex-1 flex items-center pb-24 px-4">
-          <div 
-            className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
-            style={{ 
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {products?.map((piece) => {
-              const imageUrl = getImageUrl(piece.hero_image_path);
-              const colors = categoryColors[piece.category] || { glow: "shadow-[#4a90d9]/20", text: "text-[#8ab4e8]" };
-
-              return (
-                <Link
-                  key={piece.id}
-                  href={`/piece/${piece.id}`}
-                  className="group relative transition-all duration-500 ease-out flex-shrink-0 snap-center"
-                >
-                  {/* MAGNETIC HOVER CONTAINER — stays grounded, glows */}
-                  <div className="relative transition-all duration-500 ease-out">
-                    
-                    {/* Ambient shadow — always there */}
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/60 rounded-full blur-xl transition-all duration-500 group-hover:w-32 group-hover:blur-2xl" />
-                    
-                    {/* Hover shadow — expands dramatically */}
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/40 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-3xl group-hover:bg-[#4a90d9]/15" />
-
-                    {/* Floor glow on hover */}
-                    <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 w-40 h-20 bg-gradient-to-t ${colors.glow.replace('shadow-', 'from-').replace('/30', '/20')} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl`} />
-
-                    {/* Spotlight beam on hover */}
-                    <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700">
-                      <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(138,180,232,0.06),transparent)]" />
-                    </div>
-
-                    {/* IMAGE CONTAINER — MAGNETIC: scale + glow, no lift */}
-                    <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#0a1a3a] group-hover:border-[#4a90d9]/50 transition-all duration-500 bg-[#02040a] group-hover:shadow-2xl group-hover:shadow-[#4a90d9]/20 group-hover:scale-[1.03]">
-                      {imageUrl ? (
-                        <Image
-                          src={imageUrl}
-                          alt={piece.name}
-                          fill
-                          className="object-cover transition-all duration-700 group-hover:scale-105"
-                          sizes="(max-width: 768px) 176px, (max-width: 1024px) 208px, 224px"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-[#1a2a4a] text-[10px] tracking-widest">NO IMAGE</span>
-                        </div>
-                      )}
-
-                      {/* Glass sheen */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#4a90d9]/[0.04] via-transparent to-transparent pointer-events-none" />
-                      
-                      {/* Extra sheen on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#4a90d9]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                      
-                      {/* Inner glow border on hover */}
-                      <div className="absolute inset-0 border border-[#4a90d9]/0 group-hover:border-[#4a90d9]/30 transition-all duration-500 pointer-events-none" />
-                    </div>
-
-                    {/* Category badge — appears on hover */}
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                      <span className={`text-[8px] tracking-[0.3em] uppercase ${colors.text} bg-[#02040a]/90 px-3 py-1 border border-[#0a1a3a]`}>
-                        {piece.category}
-                      </span>
-                    </div>
+        {(!products || products.length === 0) ? (
+          /* SKELETON LOADING */
+          <div className="flex-1 flex items-center pb-24 px-4">
+            <div className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex-shrink-0 snap-center">
+                  <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#0a1a3a] bg-[#02040a]">
+                    <Skeleton className="w-full h-full" />
                   </div>
-
-                  {/* INFO — stays visible, brightens on hover */}
-                  <div className="mt-6 text-center transition-all duration-500">
-                    <p className="text-[9px] text-[#1a3a5a] tracking-[0.2em] uppercase mb-1 transition-colors duration-500 group-hover:text-[#3a5570]">{piece.collection}</p>
-                    <h3 className="text-[#5a7a9a] font-serif text-sm md:text-base mb-1 transition-all duration-500 group-hover:text-[#8ab4e8] group-hover:tracking-wider">{piece.name}</h3>
-                    <p className="text-[#1a3a5a] text-[10px] tracking-widest transition-colors duration-500 group-hover:text-[#3a5570]">
-                      {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
-                    </p>
+                  <div className="mt-6 space-y-2 text-center">
+                    <Skeleton className="w-16 h-2 mx-auto" />
+                    <Skeleton className="w-24 h-3 mx-auto" />
+                    <Skeleton className="w-12 h-2 mx-auto" />
                   </div>
-                </Link>
-              );
-            })}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Gallery Floor — Horizontal Scroll, MAGNETIC HOVER */
+          <div className="flex-1 flex items-center pb-24 px-4">
+            <div 
+              className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
+              style={{ 
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+              }}
+            >
+              {products?.map((piece) => {
+                const imageUrl = getImageUrl(piece.hero_image_path);
+                const colors = categoryColors[piece.category] || { glow: "shadow-[#4a90d9]/20", text: "text-[#8ab4e8]" };
+
+                return (
+                  <Link
+                    key={piece.id}
+                    href={`/piece/${piece.id}`}
+                    className="group relative transition-all duration-500 ease-out flex-shrink-0 snap-center"
+                  >
+                    {/* MAGNETIC HOVER CONTAINER — stays grounded, glows */}
+                    <div className="relative transition-all duration-500 ease-out">
+                      
+                      {/* Ambient shadow — always there */}
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/60 rounded-full blur-xl transition-all duration-500 group-hover:w-32 group-hover:blur-2xl" />
+                      
+                      {/* Hover shadow — expands dramatically */}
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/40 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-3xl group-hover:bg-[#4a90d9]/15" />
+
+                      {/* Floor glow on hover — bioluminescent pool */}
+                      <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 w-40 h-20 bg-gradient-to-t ${colors.glow.replace('shadow-', 'from-').replace('/30', '/20')} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl`} />
+
+                      {/* Spotlight beam on hover */}
+                      <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700">
+                        <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(138,180,232,0.06),transparent)]" />
+                      </div>
+
+                      {/* IMAGE CONTAINER — MAGNETIC: scale + glow, no lift */}
+                      <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#0a1a3a] group-hover:border-[#4a90d9]/50 transition-all duration-500 bg-[#02040a] group-hover:shadow-2xl group-hover:shadow-[#4a90d9]/20 group-hover:scale-[1.03]">
+                        {imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={piece.name}
+                            fill
+                            className="object-cover transition-all duration-700 group-hover:scale-105"
+                            sizes="(max-width: 768px) 176px, (max-width: 1024px) 208px, 224px"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-[#1a2a4a] text-[10px] tracking-widest">NO IMAGE</span>
+                          </div>
+                        )}
+
+                        {/* Glass sheen */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#4a90d9]/[0.04] via-transparent to-transparent pointer-events-none" />
+                        
+                        {/* Extra sheen on hover — blue tint */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#4a90d9]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        
+                        {/* Inner glow border on hover */}
+                        <div className="absolute inset-0 border border-[#4a90d9]/0 group-hover:border-[#4a90d9]/30 transition-all duration-500 pointer-events-none" />
+                      </div>
+
+                      {/* Category badge — appears on hover */}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                        <span className={`text-[8px] tracking-[0.3em] uppercase ${colors.text} bg-[#02040a]/90 px-3 py-1 border border-[#0a1a3a]`}>
+                          {piece.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* INFO — stays visible, brightens on hover */}
+                    <div className="mt-6 text-center transition-all duration-500">
+                      <p className="text-[9px] text-[#1a3a5a] tracking-[0.2em] uppercase mb-1 transition-colors duration-500 group-hover:text-[#3a5570]">{piece.collection}</p>
+                      <h3 className="text-[#5a7a9a] font-serif text-sm md:text-base mb-1 transition-all duration-500 group-hover:text-[#8ab4e8] group-hover:tracking-wider">{piece.name}</h3>
+                      <p className="text-[#1a3a5a] text-[10px] tracking-widest transition-colors duration-500 group-hover:text-[#3a5570]">
+                        {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
