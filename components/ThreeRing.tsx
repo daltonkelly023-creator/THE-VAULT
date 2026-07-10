@@ -66,7 +66,7 @@ function Gem({ color, shape }: { color: string; shape: string }) {
   }, [shape]);
 
   return (
-    <mesh geometry={geometry} position={[0, 0.65, 0]} scale={scale} castShadow>
+    <mesh geometry={geometry} position={[0, 0.28, 0]} scale={scale} castShadow>
       <meshPhysicalMaterial
         color={color}
         metalness={0}
@@ -84,17 +84,17 @@ function Gem({ color, shape }: { color: string; shape: string }) {
 
 function Prongs({ metal }: { metal: string }) {
   const positions: [number, number, number][] = [
-    [0.22, 0.55, 0.22],
-    [-0.22, 0.55, 0.22],
-    [0.22, 0.55, -0.22],
-    [-0.22, 0.55, -0.22],
+    [0.22, 0.25, 0.22],
+    [-0.22, 0.25, 0.22],
+    [0.22, 0.25, -0.22],
+    [-0.22, 0.25, -0.22],
   ];
 
   return (
     <group>
       {positions.map((pos, i) => (
         <mesh key={i} position={pos}>
-          <cylinderGeometry args={[0.02, 0.015, 0.35, 8]} />
+          <cylinderGeometry args={[0.02, 0.015, 0.22, 8]} />
           <meshStandardMaterial color={metal} metalness={1} roughness={0.2} />
         </mesh>
       ))}
