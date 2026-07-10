@@ -5,110 +5,151 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-const metalMap: Record<string, string> = {
-  "yellow-gold": "#C5A880",
-  "white-gold": "#E8E8E8",
-  "rose-gold": "#B76E79",
-  "platinum": "#D4D4D4",
-  "black-rhodium": "#2A2A2A",
-  "sterling-silver": "#C0C0C0",
+const metalMap: Record<string, [number, number, number]> = {
+  "yellow-gold": [0.77, 0.7, 0.5],
+  "white-gold": [0.85, 0.85, 0.88],
+  "rose-gold": [0.72, 0.45, 0.45],
+  "platinum": [0.83, 0.83, 0.85],
+  "black-rhodium": [0.15, 0.15, 0.17],
+  "sterling-silver": [0.75, 0.75, 0.78],
 };
 
-const stoneMap: Record<string, string> = {
-  clear: "#E8F8FF",
-  black: "#0A0A0A",
-  blue: "#1E6FD9",
-  champagne: "#F0D878",
-  pink: "#E878A8",
-  emerald: "#2E8B57",
-  ruby: "#D02020",
+const stoneMap: Record<string, [number, number, number]> = {
+  clear: [0.9, 0.95, 1.0],
+  black: [0.04, 0.04, 0.05],
+  blue: [0.12, 0.43, 0.85],
+  champagne: [0.94, 0.85, 0.47],
+  pink: [0.91, 0.47, 0.66],
+  emerald: [0.18, 0.55, 0.34],
+  ruby: [0.82, 0.13, 0.13],
 };
 
-function Band({ metal, width }: { metal: string; width: number }) {
+function RingBand({ metal, width }: { metal: [number, number, number]; width: number }) {
   const geometry = useMemo(() => {
-    return new THREE.TorusGeometry(1, 0.12 * (width / 2.5), 32, 100);
+    const tubeRadius = 0.04 + (width / 5) * 0.06;
+    return new THREE.TorusGeometry(0.5, tubeRadius, 32, 100);
   }, [width]);
 
   return (
     <mesh geometry={geometry} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
       <meshStandardMaterial
-        color={metal}
-        metalness={1}
-        roughness={0.15}
-        envMapIntensity={1.2}
+        color={new THREE.Color(metal[0], metal[1], metal[2])}
+        metalness={1.0}
+        roughness={0.12}
+        envMapIntensity={1.5}
       />
     </mesh>
   );
 }
 
-function Gem({ color, shape }: { color: string; shape: string }) {
-  const geometry = useMemo(() => {
+function CenterStone({ color, shape }: { color: [number, number, number]; shape: string }) {
+  const { geometry, position, rotation } = useMemo(() => {
     switch (shape) {
       case "princess":
-        return new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        return {
+          geometry: new THREE.BoxGeometry(0.22, 0.22, 0.22),
+          position: [0, 0.52, 0] as [number, number, number],
+          rotation: new THREE.Euler(0, Math.PI / 4, 0),
+        };
       case "emerald":
-        return new THREE.BoxGeometry(0.6, 0.4, 0.4);
+        return {
+          geometry: new THREE.BoxGeometry(0.26, 0.18, 0.16),
+          position: [0, 0.5, 0] as [number, number, number],
+          rotation: new THREE.Euler(0, 0, 0),
+        };
       case "oval":
-        return new THREE.SphereGeometry(0.32, 32, 32);
+        return {
+          geometry: new THREE.SphereGeometry(0.14, 32, 32),
+          position: [0, 0.5, 0] as [number, number, number],
+          rotation: new THREE.Euler(0, 0, 0),
+        };
       case "pear":
-        return new THREE.SphereGeometry(0.32, 32, 32);
+        return {
+          geometry: new THREE.SphereGeometry(0.13, 32, 32),
+          position: [0, 0.5, 0] as [number, number, number],
+          rotation: new THREE.Euler(0, 0, 0),
+        };
       case "round":
       default:
-        return new THREE.CylinderGeometry(0.32, 0.32, 0.35, 32);
+        return {
+          geometry: new THREE.OctahedronGeometry(0.16, 0),
+          position: [0, 0.52, 0] as [number, number, number],
+          rotation: new THREE.Euler(0, 0, 0),
+        };
     }
   }, [shape]);
 
   const scale = useMemo(() => {
-    if (shape === "oval") return [1.4, 1, 0.85] as [number, number, number];
-    if (shape === "pear") return [1, 1.4, 0.85] as [number, number, number];
-    if (shape === "emerald") return [1.3, 1, 0.9] as [number, number, number];
+    if (shape === "oval") return [1.3, 0.9, 0.85] as [number, number, number];
+    if (shape === "pear") return [0.9, 1.3, 0.85] as [number, number, number];
     return [1, 1, 1] as [number, number, number];
   }, [shape]);
 
   return (
-    <mesh geometry={geometry} position={[0, 0.28, 0]} scale={scale} castShadow>
-      <meshPhysicalMaterial
-        color={color}
-        metalness={0}
-        roughness={0}
-        transmission={0.95}
-        thickness={0.8}
-        ior={2.4}
-        envMapIntensity={2}
-        clearcoat={1}
-        clearcoatRoughness={0}
-      />
-    </mesh>
+    <group position={position} rotation={rotation} scale={scale}>
+      <mesh geometry={geometry} castShadow>
+        <meshPhysicalMaterial
+          color={new THREE.Color(color[0], color[1], color[2])}
+          metalness={0}
+          roughness={0}
+          transmission={0.92}
+          thickness={0.6}
+          ior={2.42}
+          envMapIntensity={2.5}
+          clearcoat={1}
+          clearcoatRoughness={0}
+          attenuationColor={new THREE.Color(color[0], color[1], color[2])}
+          attenuationDistance={0.5}
+        />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.1, 6]} />
+        <meshBasicMaterial color="white" transparent opacity={0.15} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
   );
 }
 
-function Prongs({ metal }: { metal: string }) {
-  const positions: [number, number, number][] = [
-    [0.22, 0.25, 0.22],
-    [-0.22, 0.25, 0.22],
-    [0.22, 0.25, -0.22],
-    [-0.22, 0.25, -0.22],
-  ];
+function Prongs({ metal, shape }: { metal: [number, number, number]; shape: string }) {
+  const positions = useMemo(() => {
+    if (shape === "emerald" || shape === "princess") {
+      return [
+        [0.18, 0.46, 0.12],
+        [-0.18, 0.46, 0.12],
+        [0.18, 0.46, -0.12],
+        [-0.18, 0.46, -0.12],
+      ] as [number, number, number][];
+    }
+    return [
+      [0.16, 0.48, 0.16],
+      [-0.16, 0.48, 0.16],
+      [0.16, 0.48, -0.16],
+      [-0.16, 0.48, -0.16],
+    ] as [number, number, number][];
+  }, [shape]);
 
   return (
     <group>
       {positions.map((pos, i) => (
         <mesh key={i} position={pos}>
-          <cylinderGeometry args={[0.02, 0.015, 0.22, 8]} />
-          <meshStandardMaterial color={metal} metalness={1} roughness={0.2} />
+          <cylinderGeometry args={[0.012, 0.008, 0.12, 8]} />
+          <meshStandardMaterial
+            color={new THREE.Color(metal[0], metal[1], metal[2])}
+            metalness={1}
+            roughness={0.2}
+          />
         </mesh>
       ))}
     </group>
   );
 }
 
-function Scene({ config }: { config: Record<string, any> }) {
+function RingScene({ config }: { config: Record<string, any> }) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y =
-        Math.sin(state.clock.elapsedTime * 0.25) * 0.25;
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.15;
     }
   });
 
@@ -119,48 +160,50 @@ function Scene({ config }: { config: Record<string, any> }) {
 
   return (
     <group ref={groupRef}>
-      <Band metal={metal} width={width} />
-      <Gem color={stone} shape={shape} />
-      <Prongs metal={metal} />
+      <RingBand metal={metal} width={width} />
+      <CenterStone color={stone} shape={shape} />
+      <Prongs metal={metal} shape={shape} />
 
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[2, 4, 2]} intensity={1.2} castShadow />
+      <directionalLight position={[-2, 3, -2]} intensity={0.6} color="#8ab4e8" />
+      <pointLight position={[0, 2, 0]} intensity={0.8} color="#ffffff" />
       <spotLight
-        position={[4, 6, 4]}
-        intensity={1.5}
+        position={[0, 5, 0]}
+        angle={0.3}
+        penumbra={0.5}
+        intensity={0.8}
         castShadow
-        shadow-mapSize={[1024, 1024]}
       />
-      <spotLight position={[-4, 4, -4]} intensity={0.8} color="#8ab4e8" />
-      <pointLight position={[0, -2, 2]} intensity={0.4} color="#4a90d9" />
     </group>
   );
 }
 
 export default function ThreeRing({ config }: { config: Record<string, any> }) {
   return (
-    <div className="w-full h-full min-h-[280px] sm:min-h-[350px] md:min-h-[400px] cursor-grab active:cursor-grabbing">
+    <div className="w-full h-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] cursor-grab active:cursor-grabbing">
       <Canvas
-        camera={{ position: [0, 1.2, 3.2], fov: 32 }}
+        camera={{ position: [0, 0.8, 2.2], fov: 35 }}
         shadows
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping }}
       >
-        <Scene config={config} />
+        <RingScene config={config} />
         <Environment preset="studio" />
         <ContactShadows
-          position={[0, -1.3, 0]}
-          opacity={0.35}
-          scale={8}
-          blur={2.5}
-          far={4}
+          position={[0, -0.65, 0]}
+          opacity={0.4}
+          scale={6}
+          blur={2}
+          far={3}
         />
         <OrbitControls
           enablePan={false}
-          minDistance={2.2}
-          maxDistance={5}
-          minPolarAngle={Math.PI / 5}
-          maxPolarAngle={Math.PI / 1.6}
+          minDistance={1.5}
+          maxDistance={4}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2.2}
           autoRotate
-          autoRotateSpeed={1.2}
+          autoRotateSpeed={0.8}
           enableDamping
           dampingFactor={0.05}
         />
