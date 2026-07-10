@@ -1,10 +1,10 @@
-// app/configure/[id]/page.tsx
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import { useState, useEffect, Suspense } from "react";
+import ThreeRing from "@/components/ThreeRing";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -308,45 +308,53 @@ export default function Configure() {
   return (
     <main className="min-h-screen bg-[#02040a] text-[#e5e5e5]">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#02040a]/90 backdrop-blur-sm border-b border-[#0a1a3a]">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 py-4 bg-[#02040a]/90 backdrop-blur-sm border-b border-[#0a1a3a]">
         <Link
           href={`/piece/${params.id}`}
           className="text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase"
         >
-          ← Back to Details
+          <span className="sm:hidden">← Back</span>
+          <span className="hidden sm:inline">← Back to Details</span>
         </Link>
-        <span className="text-[#8ab4e8] font-serif tracking-widest text-sm">THE VAULT</span>
+        <span className="text-[#8ab4e8] font-serif tracking-widest text-sm hidden sm:block">THE VAULT</span>
         <button
           onClick={openModal}
-          className="text-xs text-[#4a90d9] border border-[#4a90d9] px-4 py-2 hover:bg-[#4a90d9] hover:text-[#02040a] transition-all tracking-widest uppercase"
+          className="text-xs text-[#4a90d9] border border-[#4a90d9] px-3 md:px-4 py-2 hover:bg-[#4a90d9] hover:text-[#02040a] transition-all tracking-widest uppercase"
         >
           Commission
         </button>
       </div>
 
-      <div className="pt-20 min-h-screen flex flex-col lg:flex-row">
-        {/* Left: Visual */}
-        <div className="flex-1 flex items-center justify-center p-8 lg:p-16 bg-[#02040a] relative overflow-hidden">
+      {/* MOBILE: Stacked. DESKTOP: Side-by-side */}
+      <div className="pt-16 md:pt-20 min-h-screen flex flex-col lg:flex-row">
+        {/* Visual — full width on mobile, half on desktop */}
+        <div className="flex-shrink-0 flex items-center justify-center p-4 md:p-8 lg:p-16 bg-[#02040a] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,144,217,0.03)_0%,transparent_70%)]" />
-          <div className="relative w-full max-w-md aspect-square">
+          <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-full lg:max-w-md lg:h-auto lg:aspect-square">
             {piece.category === "ring" ? (
-              <RingSVG config={config} />
-            ) : (
-              <GenericPreview piece={piece} config={config} category={piece.category} />
-            )}
+  <Suspense fallback={
+    <div className="w-full h-64 md:h-80 flex items-center justify-center">
+      <span className="text-[#3a5570] text-xs tracking-widest">Forging your ring...</span>
+    </div>
+  }>
+    <ThreeRing config={config} />
+  </Suspense>
+) : (
+  <GenericPreview piece={piece} config={config} category={piece.category} />
+)}
           </div>
         </div>
 
-        {/* Right: Controls */}
-        <div className="w-full lg:w-[450px] border-l border-[#0a1a3a] p-8 lg:p-12 overflow-y-auto">
-          <div className="mb-10">
+        {/* Controls — full width on mobile, fixed width on desktop */}
+        <div className="flex-1 lg:flex-none lg:w-[450px] border-t lg:border-t-0 lg:border-l border-[#0a1a3a] p-4 md:p-8 lg:p-12 overflow-y-auto">
+          <div className="mb-6 md:mb-10">
             <p className="text-xs text-[#3a5570] tracking-[0.2em] uppercase mb-2">{piece.collection}</p>
-            <h1 className="text-3xl font-serif text-[#8ab4e8] mb-1">{piece.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-serif text-[#8ab4e8] mb-1">{piece.name}</h1>
             <p className="text-sm text-[#3a5570]">{catConfig.label}</p>
           </div>
 
           {catConfig.options.map((opt) => (
-            <div key={opt.key} className="mb-8">
+            <div key={opt.key} className="mb-6 md:mb-8">
               <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-3">
                 {opt.label}
                 {opt.key === "bandWidth" && config[opt.key] ? ` — ${config[opt.key]}mm` : ""}
@@ -363,7 +371,7 @@ export default function Configure() {
                   step={opt.key === "bandWidth" ? 0.5 : opt.key === "wristSize" ? 0.5 : 1}
                   value={config[opt.key] as number}
                   onChange={(e) => setConfig({ ...config, [opt.key]: parseFloat(e.target.value) })}
-                  className="w-full accent-[#4a90d9]"
+                  className="w-full accent-[#4a90d9] h-6 md:h-auto"
                 />
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -371,10 +379,11 @@ export default function Configure() {
                     <button
                       key={String(val.value)}
                       onClick={() => setConfig({ ...config, [opt.key]: val.value })}
-                      className={`px-4 py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${config[opt.key] === val.value
-                        ? "border-[#4a90d9] text-[#4a90d9] bg-[#4a90d9]/10"
-                        : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a] hover:text-[#5ba3e8]"
-                        }`}
+                      className={`flex-1 min-w-[80px] md:flex-none px-3 md:px-4 py-3 md:py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${
+                        config[opt.key] === val.value
+                          ? "border-[#4a90d9] text-[#4a90d9] bg-[#4a90d9]/10"
+                          : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a] hover:text-[#5ba3e8]"
+                      }`}
                     >
                       {val.label}
                     </button>
@@ -384,8 +393,8 @@ export default function Configure() {
             </div>
           ))}
 
-          {/* Engraving (universal) */}
-          <div className="mb-10">
+          {/* Engraving */}
+          <div className="mb-6 md:mb-10">
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-3">Engraving</label>
             <input
               type="text"
@@ -399,7 +408,7 @@ export default function Configure() {
           </div>
 
           {/* Price */}
-          <div className="border-t border-[#0a1a3a] pt-6 mb-6">
+          <div className="border-t border-[#0a1a3a] pt-4 md:pt-6 mb-4 md:mb-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-[#3a5570] tracking-widest uppercase">Base Price</span>
               <span className="text-sm text-[#5a7a9a]">
@@ -431,24 +440,26 @@ export default function Configure() {
         </div>
       </div>
 
-      {/* Commission Modal with smooth animation */}
+      {/* Commission Modal */}
       {showCommission && (
         <div
-          className={`fixed inset-0 z-[100] flex items-center justify-center p-4 transition-all duration-300 ${modalState === "entering" || modalState === "visible"
-            ? "bg-black/80 backdrop-blur-sm"
-            : "bg-black/0 backdrop-blur-none"
-            }`}
+          className={`fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 ${
+            modalState === "entering" || modalState === "visible"
+              ? "bg-black/80 backdrop-blur-sm"
+              : "bg-black/0 backdrop-blur-none"
+          }`}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
         >
           <div
-            className={`bg-[#02040a] border border-[#0a1a3a] max-w-md w-full p-8 relative transition-all duration-300 ${modalState === "entering"
-              ? "opacity-0 scale-95"
-              : modalState === "visible"
-                ? "opacity-100 scale-100"
-                : "opacity-0 scale-95"
-              }`}
+            className={`bg-[#02040a] border border-[#0a1a3a] w-full sm:max-w-md sm:rounded-none p-6 sm:p-8 relative transition-all duration-300 max-h-[90vh] overflow-y-auto ${
+              modalState === "entering"
+                ? "opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+                : modalState === "visible"
+                ? "opacity-100 translate-y-0 sm:scale-100"
+                : "opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+            }`}
           >
             <button
               onClick={closeModal}
@@ -463,9 +474,7 @@ export default function Configure() {
       )}
     </main>
   );
-}
-
-/* ---------- SVG RING WITH GRADIENTS ---------- */
+}/* ---------- SVG RING WITH GRADIENTS ---------- */
 function RingSVG({ config }: { config: ConfigState }) {
   const metal = metalColors[config.metal as string] || "#C5A880";
   const stone = stoneColors[config.stoneColor as string] || "#E8F8FF";
@@ -574,17 +583,17 @@ function GenericPreview({ piece, config, category }: { piece: any; config: Confi
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center">
       {imageUrl ? (
-        <div className="relative w-64 h-64 md:w-80 md:h-80">
+        <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
           <img src={imageUrl} alt={piece.name} className="w-full h-full object-cover opacity-80" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-transparent to-transparent" />
         </div>
       ) : (
-        <div className="w-64 h-64 border border-[#0a1a3a] flex items-center justify-center">
+        <div className="w-48 h-48 sm:w-64 sm:h-64 border border-[#0a1a3a] flex items-center justify-center">
           <span className="text-[#1a3a5a] text-xs tracking-widest">NO PREVIEW</span>
         </div>
       )}
 
-      <div className="mt-8 space-y-2 text-center">
+      <div className="mt-6 sm:mt-8 space-y-2 text-center">
         <p className="text-[10px] text-[#3a5570] tracking-[0.2em] uppercase">{category} Configuration</p>
         {Object.entries(config).map(([key, val]) => {
           if (key === "engraving" && !val) return null;
