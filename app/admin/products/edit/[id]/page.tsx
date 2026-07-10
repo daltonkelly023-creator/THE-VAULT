@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -10,9 +10,17 @@ export default function EditProduct() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [product, setProduct] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    story: "",
+    price_cents: 0,
+    is_published: false,
+  });
 
+  // Fetch once on mount
   useEffect(() => {
+    let mounted = true;
+    
     async function fetchProduct() {
       const { data, error } = await supabase
         .from("products")
@@ -20,25 +28,33 @@ export default function EditProduct() {
         .eq("id", params.id)
         .single();
       
+      if (!mounted) return;
+      
       if (error || !data) {
         setError("Product not found");
         setLoading(false);
         return;
       }
       
-      setProduct(data);
+      setFormData({
+        name: data.name,
+        story: data.story || "",
+        price_cents: data.price_cents,
+        is_published: data.is_published,
+      });
       setLoading(false);
     }
+    
     fetchProduct();
+    return () => { mounted = false; };
   }, [params.id]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError("");
 
-    // Validate price is a number
-    const priceCents = parseInt(product.price_cents);
+    const priceCents = parseInt(String(formData.price_cents));
     if (isNaN(priceCents) || priceCents < 0) {
       setError("Price must be a valid number");
       setSaving(false);
@@ -48,10 +64,10 @@ export default function EditProduct() {
     const { error: updateError } = await supabase
       .from("products")
       .update({
-        name: product.name,
-        story: product.story,
+        name: formData.name,
+        story: formData.story,
         price_cents: priceCents,
-        is_published: product.is_published,
+        is_published: formData.is_published,
       })
       .eq("id", params.id);
 
@@ -62,10 +78,10 @@ export default function EditProduct() {
       return;
     }
 
-    // Force refresh and redirect
-    router.refresh();
+    // Small delay to let Supabase propagate
+    await new Promise(r => setTimeout(r, 500));
     router.push("/admin/products");
-  }
+  }, [formData, params.id, router]);
 
   if (loading) {
     return (
@@ -75,18 +91,10 @@ export default function EditProduct() {
     );
   }
 
-  if (error && !product) {
+  if (error && !formData.name) {
     return (
       <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
         <p className="text-[#c94040]">{error}</p>
-      </main>
-    );
-  }
-
-  if (!product) {
-    return (
-      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
-        <p className="text-[#444]">Product not found.</p>
       </main>
     );
   }
@@ -101,7 +109,7 @@ export default function EditProduct() {
           ← Back
         </button>
         <span className="text-[#8ab4e8] font-serif tracking-widest text-sm">EDIT PRODUCT</span>
-        <span className="text-xs text-[#3a5570]">{product.name}</span>
+        <span className="text-xs text-[#3a5570]">{formData.name}</span>
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-8">
@@ -116,8 +124,8 @@ export default function EditProduct() {
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-2">Name</label>
             <input
               type="text"
-              value={product.name}
-              onChange={(e) => setProduct({ ...product, name: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
             />
           </div>
@@ -125,8 +133,8 @@ export default function EditProduct() {
           <div>
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-2">Story</label>
             <textarea
-              value={product.story || ""}
-              onChange={(e) => setProduct({ ...product, story: e.target.value })}
+              value={formData.story}
+              onChange={(e) => setFormData({ ...formData, story: e.target.value })}
               rows={4}
               className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm resize-none"
             />
@@ -135,23 +143,26 @@ export default function EditProduct() {
           <div>
             <label className="block text-xs text-[#3a5570] tracking-widest uppercase mb-2">Price (cents)</label>
             <input
-              type="number"
-              min="0"
-              step="1"
-              value={product.price_cents}
-              onChange={(e) => setProduct({ ...product, price_cents: e.target.value })}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={formData.price_cents}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "");
+                setFormData({ ...formData, price_cents: val === "" ? 0 : parseInt(val) });
+              }}
               className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
             />
             <p className="text-[#1a3a5a] text-[10px] mt-1">
-              Display: ${(parseInt(product.price_cents || 0) / 100).toLocaleString()}
+              Display: ${(formData.price_cents / 100).toLocaleString()}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
-              checked={product.is_published}
-              onChange={(e) => setProduct({ ...product, is_published: e.target.checked })}
+              checked={formData.is_published}
+              onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
               className="accent-[#4a90d9] w-4 h-4"
             />
             <label className="text-xs text-[#3a5570] tracking-widest uppercase">Published</label>
