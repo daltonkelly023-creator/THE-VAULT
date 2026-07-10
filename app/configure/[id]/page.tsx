@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { useState, useEffect, Suspense } from "react";
 import ThreeRing from "@/components/ThreeRing";
 
 type ConfigState = Record<string, any>;
@@ -85,6 +85,15 @@ const categoryConfig: Record<string, CategoryConfig> = {
           { label: "3mm", value: 3 },
           { label: "4mm", value: 4 },
           { label: "5mm", value: 5 },
+        ],
+      },
+      {
+        key: "stoneHeight",
+        label: "Stone Height",
+        values: [
+          { label: "Flush", value: 0.35 },
+          { label: "Standard", value: 0.52 },
+          { label: "Elevated", value: 0.7 },
         ],
       },
     ],
@@ -322,25 +331,25 @@ export default function Configure() {
 
       {/* MOBILE: Stacked. DESKTOP: Side-by-side */}
       <div className="pt-16 md:pt-20 min-h-screen flex flex-col lg:flex-row">
-        {/* Visual — full width on mobile, half on desktop */}
+        {/* Visual */}
         <div className="flex-shrink-0 flex items-center justify-center p-4 md:p-8 lg:p-16 bg-[#02040a] relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,144,217,0.03)_0%,transparent_70%)]" />
           <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-full lg:max-w-md lg:h-auto lg:aspect-square">
             {piece.category === "ring" ? (
-  <Suspense fallback={
-    <div className="w-full h-64 md:h-80 flex items-center justify-center">
-      <span className="text-[#3a5570] text-xs tracking-widest">Forging your ring...</span>
-    </div>
-  }>
-    <ThreeRing config={config} />
-  </Suspense>
-) : (
-  <GenericPreview piece={piece} config={config} category={piece.category} />
-)}
+              <Suspense fallback={
+                <div className="w-full h-64 md:h-80 flex items-center justify-center">
+                  <span className="text-[#3a5570] text-xs tracking-widest">Forging your ring...</span>
+                </div>
+              }>
+                <ThreeRing config={config} />
+              </Suspense>
+            ) : (
+              <GenericPreview piece={piece} config={config} category={piece.category} />
+            )}
           </div>
         </div>
 
-        {/* Controls — full width on mobile, fixed width on desktop */}
+        {/* Controls */}
         <div className="flex-1 lg:flex-none lg:w-[450px] border-t lg:border-t-0 lg:border-l border-[#0a1a3a] p-4 md:p-8 lg:p-12 overflow-y-auto">
           <div className="mb-6 md:mb-10">
             <p className="text-xs text-[#3a5570] tracking-[0.2em] uppercase mb-2">{piece.collection}</p>
@@ -356,14 +365,15 @@ export default function Configure() {
                 {opt.key === "chainLength" && config[opt.key] ? ` — ${config[opt.key]}″` : ""}
                 {opt.key === "wristSize" && config[opt.key] ? ` — ${config[opt.key]}″` : ""}
                 {opt.key === "stoneSize" && config[opt.key] ? ` — ${config[opt.key]}mm` : ""}
+                {opt.key === "stoneHeight" && config[opt.key] ? ` — ${config[opt.key] === 0.35 ? "Flush" : config[opt.key] === 0.52 ? "Standard" : "Elevated"}` : ""}
               </label>
 
-              {opt.key === "bandWidth" || opt.key === "chainLength" || opt.key === "wristSize" || opt.key === "stoneSize" ? (
+              {opt.key === "bandWidth" || opt.key === "chainLength" || opt.key === "wristSize" || opt.key === "stoneSize" || opt.key === "stoneHeight" ? (
                 <input
                   type="range"
                   min={opt.values[0].value as number}
                   max={opt.values[opt.values.length - 1].value as number}
-                  step={opt.key === "bandWidth" ? 0.5 : opt.key === "wristSize" ? 0.5 : 1}
+                  step={opt.key === "bandWidth" ? 0.5 : opt.key === "wristSize" ? 0.5 : opt.key === "stoneHeight" ? 0.17 : 1}
                   value={config[opt.key] as number}
                   onChange={(e) => setConfig({ ...config, [opt.key]: parseFloat(e.target.value) })}
                   className="w-full accent-[#4a90d9] h-6 md:h-auto"
@@ -469,7 +479,9 @@ export default function Configure() {
       )}
     </main>
   );
-}/* ---------- SVG RING WITH GRADIENTS ---------- */
+}
+
+/* ---------- SVG RING WITH GRADIENTS ---------- */
 function RingSVG({ config }: { config: ConfigState }) {
   const metal = metalColors[config.metal as string] || "#C5A880";
   const stone = stoneColors[config.stoneColor as string] || "#E8F8FF";
@@ -641,6 +653,7 @@ function CommissionForm({
       message: `Configuration Request for ${piece.name}\n\n${configLines}\n${config.engraving ? `Engraving: "${config.engraving}"\n` : ""}\n\nAdditional notes:\n${formData.get("message") || "None"}`,
       pieceName: `${piece.name} (Custom Configuration)`,
       collection: piece.collection,
+      totalPrice: totalPrice,
     };
 
     try {
