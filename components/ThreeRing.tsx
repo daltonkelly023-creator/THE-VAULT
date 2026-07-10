@@ -42,38 +42,33 @@ function RingBand({ metal, width }: { metal: [number, number, number]; width: nu
   );
 }
 
-function CenterStone({ color, shape }: { color: [number, number, number]; shape: string }) {
-  const { geometry, position, rotation } = useMemo(() => {
+function CenterStone({ color, shape, height }: { color: [number, number, number]; shape: string; height: number }) {
+  const { geometry, rotation } = useMemo(() => {
     switch (shape) {
       case "princess":
         return {
           geometry: new THREE.BoxGeometry(0.22, 0.22, 0.22),
-          position: [0, 0.52, 0] as [number, number, number],
           rotation: new THREE.Euler(0, Math.PI / 4, 0),
         };
       case "emerald":
         return {
           geometry: new THREE.BoxGeometry(0.26, 0.18, 0.16),
-          position: [0, 0.5, 0] as [number, number, number],
           rotation: new THREE.Euler(0, 0, 0),
         };
       case "oval":
         return {
           geometry: new THREE.SphereGeometry(0.14, 32, 32),
-          position: [0, 0.5, 0] as [number, number, number],
           rotation: new THREE.Euler(0, 0, 0),
         };
       case "pear":
         return {
           geometry: new THREE.SphereGeometry(0.13, 32, 32),
-          position: [0, 0.5, 0] as [number, number, number],
           rotation: new THREE.Euler(0, 0, 0),
         };
       case "round":
       default:
         return {
           geometry: new THREE.OctahedronGeometry(0.16, 0),
-          position: [0, 0.52, 0] as [number, number, number],
           rotation: new THREE.Euler(0, 0, 0),
         };
     }
@@ -86,7 +81,7 @@ function CenterStone({ color, shape }: { color: [number, number, number]; shape:
   }, [shape]);
 
   return (
-    <group position={position} rotation={rotation} scale={scale}>
+    <group position={[0, height, 0]} rotation={rotation} scale={scale}>
       <mesh geometry={geometry} castShadow>
         <meshPhysicalMaterial
           color={new THREE.Color(color[0], color[1], color[2])}
@@ -98,8 +93,6 @@ function CenterStone({ color, shape }: { color: [number, number, number]; shape:
           envMapIntensity={2.5}
           clearcoat={1}
           clearcoatRoughness={0}
-          attenuationColor={new THREE.Color(color[0], color[1], color[2])}
-          attenuationDistance={0.5}
         />
       </mesh>
       <mesh position={[0, 0.08, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -110,23 +103,13 @@ function CenterStone({ color, shape }: { color: [number, number, number]; shape:
   );
 }
 
-function Prongs({ metal, shape }: { metal: [number, number, number]; shape: string }) {
-  const positions = useMemo(() => {
-    if (shape === "emerald" || shape === "princess") {
-      return [
-        [0.18, 0.46, 0.12],
-        [-0.18, 0.46, 0.12],
-        [0.18, 0.46, -0.12],
-        [-0.18, 0.46, -0.12],
-      ] as [number, number, number][];
-    }
-    return [
-      [0.16, 0.48, 0.16],
-      [-0.16, 0.48, 0.16],
-      [0.16, 0.48, -0.16],
-      [-0.16, 0.48, -0.16],
-    ] as [number, number, number][];
-  }, [shape]);
+function Prongs({ metal, gemY }: { metal: [number, number, number]; gemY: number }) {
+  const positions: [number, number, number][] = [
+    [0.16, gemY - 0.04, 0.16],
+    [-0.16, gemY - 0.04, 0.16],
+    [0.16, gemY - 0.04, -0.16],
+    [-0.16, gemY - 0.04, -0.16],
+  ];
 
   return (
     <group>
@@ -157,12 +140,13 @@ function RingScene({ config }: { config: Record<string, any> }) {
   const stone = stoneMap[(config.stoneColor as string) || "clear"];
   const width = (config.bandWidth as number) || 2;
   const shape = (config.stoneShape as string) || "round";
+  const stoneHeight = (config.stoneHeight as number) || 0.52;
 
   return (
     <group ref={groupRef}>
       <RingBand metal={metal} width={width} />
-      <CenterStone color={stone} shape={shape} />
-      <Prongs metal={metal} shape={shape} />
+      <CenterStone color={stone} shape={shape} height={stoneHeight} />
+      <Prongs metal={metal} gemY={stoneHeight} />
 
       <ambientLight intensity={0.4} />
       <directionalLight position={[2, 4, 2]} intensity={1.2} castShadow />
