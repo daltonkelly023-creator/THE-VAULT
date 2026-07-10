@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AdminGate() {
   const [password, setPassword] = useState("");
@@ -10,7 +11,7 @@ export default function AdminGate() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // In production, this should be a server check. For now, client-side with env.
+    
     if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       sessionStorage.setItem("admin-auth", "true");
       router.push("/admin/products");
@@ -41,7 +42,7 @@ export default function AdminGate() {
                 setError(false);
               }}
               placeholder="Enter passphrase"
-              className="w-full bg-[#0a0a0a]/80 border border-[#0a1a3a] px-4 py-3 text-[#8ab4e8] text-center tracking-widest text-sm focus:border-[#4a90d9] focus:outline-none transition-colors placeholder:text-[#1a3a5a]"
+              className="w-full bg-[#02040a]/80 border border-[#0a1a3a] px-4 py-3 text-[#8ab4e8] text-center tracking-widest text-sm focus:border-[#4a90d9] focus:outline-none transition-colors placeholder:text-[#1a3a5a]"
             />
           </div>
 
@@ -56,6 +57,25 @@ export default function AdminGate() {
             Enter
           </button>
         </form>
+
+        {/* Quick nav for authenticated users */}
+        <div className="mt-8 pt-6 border-t border-[#0a1a3a] space-y-3">
+          <p className="text-[10px] text-[#1a3a5a] tracking-widest uppercase text-center">Authorized Access</p>
+          <div className="flex justify-center gap-4">
+            <Link 
+              href="/admin/products" 
+              className="text-[10px] text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase border-b border-[#0a1a3a] hover:border-[#4a90d9] pb-0.5"
+            >
+              Products
+            </Link>
+            <Link 
+              href="/admin/commissions" 
+              className="text-[10px] text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase border-b border-[#0a1a3a] hover:border-[#4a90d9] pb-0.5"
+            >
+              Commissions
+            </Link>
+          </div>
+        </div>
       </div>
     </main>
   );
