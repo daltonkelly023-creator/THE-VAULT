@@ -1,5 +1,10 @@
-// app/api/commission/route.ts
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +17,26 @@ export async function POST(request: Request) {
       );
     }
 
+    // 1. Save to database first
+    const { error: dbError } = await supabase.from("commissions").insert({
+      name,
+      email,
+      piece_name: pieceName,
+      collection,
+      configuration_summary: message,
+      message,
+      status: "NEW",
+      notes: "",
+    });
+
+    if (dbError) {
+      return NextResponse.json(
+        { error: "Failed to save commission", details: dbError.message },
+        { status: 500 }
+      );
+    }
+
+    // 2. Send email via Resend
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     if (!RESEND_API_KEY) {
       return NextResponse.json(
@@ -32,14 +57,14 @@ export async function POST(request: Request) {
         reply_to: email,
         subject: `Commission Request: ${pieceName}`,
         html: `<html>
-          <body style="font-family:Georgia,serif;background:#0a0a0a;color:#e5e5e5;padding:40px;">
-            <h1 style="color:#C5A880;text-align:center;">The Vault</h1>
-            <h2 style="text-align:center;color:#666;">Commission Request</h2>
-            <p><strong>Client:</strong> ${name} (${email})</p>
-            <p><strong>Piece:</strong> ${pieceName}</p>
-            <p><strong>Collection:</strong> ${collection || "N/A"}</p>
-            ${message ? `<p><strong>Message:</strong> ${message}</p>` : ""}
-            <p style="color:#666;margin-top:40px;text-align:center;">Reply directly to this email to contact the client.</p>
+          <body style="font-family:Georgia,serif;background:#02040a;color:#e5e5e5;padding:40px;">
+            <h1 style="color:#8ab4e8;text-align:center;">The Vault</h1>
+            <h2 style="text-align:center;color:#3a5570;">Commission Request</h2>
+            <p><strong style="color:#5a7a9a;">Client:</strong> ${name} (${email})</p>
+            <p><strong style="color:#5a7a9a;">Piece:</strong> ${pieceName}</p>
+            <p><strong style="color:#5a7a9a;">Collection:</strong> ${collection || "N/A"}</p>
+            ${message ? `<p><strong style="color:#5a7a9a;">Message:</strong></p><pre style="background:#0a1a3a;padding:12px;border-radius:4px;color:#5a7a9a;font-size:12px;">${message}</pre>` : ""}
+            <p style="color:#3a5570;margin-top:40px;text-align:center;font-size:12px;">Reply directly to this email to contact the client. View all commissions in your admin dashboard.</p>
           </body>
         </html>`,
       }),
@@ -48,8 +73,8 @@ export async function POST(request: Request) {
     if (!resendResponse.ok) {
       const errorText = await resendResponse.text();
       return NextResponse.json(
-        { error: "Failed to send email", details: errorText },
-        { status: 500 }
+        { error: "Saved to database but failed to send email", details: errorText },
+        { status: 207 }
       );
     }
 
