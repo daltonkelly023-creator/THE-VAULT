@@ -140,7 +140,7 @@ function RingScene({ config }: { config: Record<string, any> }) {
   const stone = stoneMap[(config.stoneColor as string) || "clear"];
   const width = (config.bandWidth as number) || 2;
   const shape = (config.stoneShape as string) || "round";
-  const stoneHeight = (config.stoneHeight as number) || 0.52;
+  const stoneHeight = (config.stoneHeight as number) || 0.22;
 
   return (
     <group ref={groupRef}>

@@ -88,14 +88,11 @@ const categoryConfig: Record<string, CategoryConfig> = {
         ],
       },
       {
-        key: "stoneHeight",
-        label: "Stone Height",
-        values: [
-          { label: "Flush", value: 0.35 },
-          { label: "Standard", value: 0.52 },
-          { label: "Elevated", value: 0.7 },
-        ],
-      },
+       key: "stoneHeight", label: "Stone Height", values: [
+  { label: "Flush", value: 0.15 },
+  { label: "Standard", value: 0.22 },
+  { label: "Elevated", value: 0.35 },
+]},
     ],
   },
   necklace: {
