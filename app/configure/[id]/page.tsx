@@ -88,11 +88,12 @@ const categoryConfig: Record<string, CategoryConfig> = {
         ],
       },
       {
-       key: "stoneHeight", label: "Stone Height", values: [
-  { label: "Flush", value: 0.15 },
-  { label: "Standard", value: 0.22 },
-  { label: "Elevated", value: 0.35 },
-]},
+        key: "stoneHeight", label: "Stone Height", values: [
+          { label: "Flush", value: 0.15 },
+          { label: "Standard", value: 0.22 },
+          { label: "Elevated", value: 0.35 },
+        ]
+      },
     ],
   },
   necklace: {
@@ -203,16 +204,8 @@ const categoryConfig: Record<string, CategoryConfig> = {
     label: "Timepiece Configuration",
     options: [
       {
-        key: "strapMaterial",
-        label: "Strap",
-        values: [
-          { label: "Leather", value: "leather", price: 0 },
-          { label: "Alligator", value: "alligator", price: 400 },
-          { label: "Metal Bracelet", value: "metal", price: 600 },
-          { label: "Rubber", value: "rubber", price: -100 },
-        ],
-      },
-      {
+
+
         key: "dialColor",
         label: "Dial Color",
         values: [
@@ -335,7 +328,7 @@ export default function Configure() {
             {piece.category === "ring" ? (
               <Suspense fallback={
                 <div className="w-full h-64 md:h-80 flex items-center justify-center">
-                  <span className="text-[#3a5570] text-xs tracking-widest">Forging your ring...</span>
+                  <span className="text-[#3a5570] text-xs tracking-widest">Forging your piece...</span>
                 </div>
               }>
                 <ThreeRing config={config} />
@@ -381,11 +374,10 @@ export default function Configure() {
                     <button
                       key={String(val.value)}
                       onClick={() => setConfig({ ...config, [opt.key]: val.value })}
-                      className={`flex-1 min-w-[80px] md:flex-none px-3 md:px-4 py-3 md:py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${
-                        config[opt.key] === val.value
-                          ? "border-[#4a90d9] text-[#4a90d9] bg-[#4a90d9]/10"
-                          : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a] hover:text-[#5ba3e8]"
-                      }`}
+                      className={`flex-1 min-w-[80px] md:flex-none px-3 md:px-4 py-3 md:py-2.5 text-xs tracking-widest uppercase border transition-all duration-300 ${config[opt.key] === val.value
+                        ? "border-[#4a90d9] text-[#4a90d9] bg-[#4a90d9]/10"
+                        : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a] hover:text-[#5ba3e8]"
+                        }`}
                     >
                       {val.label}
                     </button>
@@ -445,23 +437,21 @@ export default function Configure() {
       {/* Commission Modal */}
       {showCommission && (
         <div
-          className={`fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 ${
-            modalState === "entering" || modalState === "visible"
-              ? "bg-black/80 backdrop-blur-sm"
-              : "bg-black/0 backdrop-blur-none"
-          }`}
+          className={`fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 ${modalState === "entering" || modalState === "visible"
+            ? "bg-black/80 backdrop-blur-sm"
+            : "bg-black/0 backdrop-blur-none"
+            }`}
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
         >
           <div
-            className={`bg-[#02040a] border border-[#0a1a3a] w-full sm:max-w-md sm:rounded-none p-6 sm:p-8 relative transition-all duration-300 max-h-[90vh] overflow-y-auto ${
-              modalState === "entering"
-                ? "opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
-                : modalState === "visible"
+            className={`bg-[#02040a] border border-[#0a1a3a] w-full sm:max-w-md sm:rounded-none p-6 sm:p-8 relative transition-all duration-300 max-h-[90vh] overflow-y-auto ${modalState === "entering"
+              ? "opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
+              : modalState === "visible"
                 ? "opacity-100 translate-y-0 sm:scale-100"
                 : "opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
-            }`}
+              }`}
           >
             <button
               onClick={closeModal}

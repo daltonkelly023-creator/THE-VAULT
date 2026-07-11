@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseServer";
 
 export default function PieceDetail() {
   const params = useParams();
@@ -90,7 +90,7 @@ export default function PieceDetail() {
           <div className="relative w-full max-w-lg aspect-[3/4] mb-6">
             {/* Glow behind image */}
             <div className="absolute inset-0 bg-[#4a90d9]/5 blur-3xl rounded-full scale-75" />
-            
+
             {/* Image container */}
             <div className="relative w-full h-full border border-[#0a1a3a] bg-[#02040a] overflow-hidden">
               {allImages.length > 0 ? (
@@ -128,11 +128,10 @@ export default function PieceDetail() {
                 <button
                   key={i}
                   onClick={() => handleImageChange(i)}
-                  className={`relative w-16 h-16 border overflow-hidden transition-all duration-300 ${
-                    activeImage === i
-                      ? "border-[#4a90d9] shadow-lg shadow-[#4a90d9]/20"
-                      : "border-[#0a1a3a] hover:border-[#1a3a5a] opacity-40 hover:opacity-100"
-                  }`}
+                  className={`relative w-16 h-16 border overflow-hidden transition-all duration-300 ${activeImage === i
+                    ? "border-[#4a90d9] shadow-lg shadow-[#4a90d9]/20"
+                    : "border-[#0a1a3a] hover:border-[#1a3a5a] opacity-40 hover:opacity-100"
+                    }`}
                 >
                   <Image
                     src={url}

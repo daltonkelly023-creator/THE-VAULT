@@ -228,14 +228,12 @@ export default function NewProduct() {
           <button
             type="button"
             onClick={() => setForm({ ...form, is_published: !form.is_published })}
-            className={`w-12 h-6 border transition-all duration-300 relative ${
-              form.is_published ? "border-[#4a90d9] bg-[#4a90d9]/20" : "border-[#0a1a3a] bg-[#0a0a0a]"
-            }`}
+            className={`w-12 h-6 border transition-all duration-300 relative ${form.is_published ? "border-[#4a90d9] bg-[#4a90d9]/20" : "border-[#0a1a3a] bg-[#0a0a0a]"
+              }`}
           >
             <div
-              className={`absolute top-0.5 w-5 h-5 bg-[#8ab4e8] transition-all duration-300 ${
-                form.is_published ? "left-6" : "left-0.5"
-              }`}
+              className={`absolute top-0.5 w-5 h-5 bg-[#8ab4e8] transition-all duration-300 ${form.is_published ? "left-6" : "left-0.5"
+                }`}
             />
           </button>
           <span className="text-xs text-[#3a5570] tracking-widest uppercase">

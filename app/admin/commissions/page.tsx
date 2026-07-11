@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseServer";
 
 type Commission = {
   id: string;
@@ -93,11 +93,10 @@ export default function CommissionsDashboard() {
             <button
               key={s}
               onClick={() => setFilter(s)}
-              className={`px-4 py-2 text-[10px] tracking-widest uppercase border transition-all duration-300 ${
-                filter === s
-                  ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                  : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
-              }`}
+              className={`px-4 py-2 text-[10px] tracking-widest uppercase border transition-all duration-300 ${filter === s
+                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
+                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
+                }`}
             >
               {s} {counts[s as keyof typeof counts] > 0 && `(${counts[s as keyof typeof counts]})`}
             </button>
@@ -167,11 +166,10 @@ export default function CommissionsDashboard() {
                             <button
                               key={s}
                               onClick={() => updateStatus(c.id, s)}
-                              className={`px-3 py-1.5 text-[10px] tracking-widest uppercase border transition-all ${
-                                c.status === s
-                                  ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                                  : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
-                              }`}
+                              className={`px-3 py-1.5 text-[10px] tracking-widest uppercase border transition-all ${c.status === s
+                                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
+                                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
+                                }`}
                             >
                               {s}
                             </button>

@@ -1,0 +1,19 @@
+import { createClient } from "@/utils/supabase/server";
+import { notFound } from "next/navigation";
+import EditProductPage from "./page";
+
+export default async function AdminEditProduct({ params }: { params: { id: string } }) {
+  const supabase = await createClient();
+
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", params.id)
+    .single();
+
+  if (error || !product) {
+    notFound();
+  }
+
+  return <EditProductPage product={product} />;
+}

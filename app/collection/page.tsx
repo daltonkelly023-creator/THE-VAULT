@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseServer";
 import Skeleton from "@/components/Skeleton";
 
 export const revalidate = 60;
@@ -61,11 +61,11 @@ export default async function Collection({
       <div className="fixed inset-0 pointer-events-none">
         {/* Base gradient — abyssal blue-black */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#02040a] via-[#040818] to-[#02040a]" />
-        
+
         {/* Subtle depth layers */}
         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#061025]/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#010208]/80 to-transparent" />
-        
+
         {/* BIOLUMINESCENT FIELD — 18 dots, 40% red, slow breathing drift */}
         {(() => {
           const particles = [
@@ -81,7 +81,7 @@ export default async function Collection({
             { top: '72%', left: '35%', size: 'w-0.5 h-0.5', color: 'bg-[#4a90d9]', breathe: '7.8s', bDel: '4.1s', drift: '22s', dDel: '7s' },
             { top: '38%', left: '92%', size: 'w-1 h-1', color: 'bg-[#5ba3e8]', breathe: '6.1s', bDel: '1.1s', drift: '14s', dDel: '3.5s' },
             { top: '82%', left: '60%', size: 'w-0.5 h-0.5', color: 'bg-[#3d7bc7]', breathe: '5.4s', bDel: '3.8s', drift: '19s', dDel: '2.5s' },
-            
+
             // Red (40%) — warmer, slightly faster, more erratic
             { top: '25%', left: '88%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '3.8s', bDel: '0.5s', drift: '11s', dDel: '1s' },
             { top: '48%', left: '30%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', breathe: '3.2s', bDel: '2.3s', drift: '10s', dDel: '4s' },
@@ -107,12 +107,12 @@ export default async function Collection({
             />
           ));
         })()}
-        
+
         {/* Subtle light rays from above */}
         <div className="absolute top-0 left-1/4 w-px h-[300px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
         <div className="absolute top-0 left-1/2 w-px h-[400px] bg-gradient-to-b from-[#5ba3e8]/8 to-transparent" />
         <div className="absolute top-0 left-3/4 w-px h-[250px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
-        
+
         {/* Floor glow — bioluminescent sediment */}
         <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-[#0a1a3a]/30 via-[#061025]/10 to-transparent" />
       </div>
@@ -135,11 +135,10 @@ export default async function Collection({
             <Link
               key={cat.key}
               href={cat.key === "all" ? "/collection" : `/collection?category=${cat.key}`}
-              className={`px-5 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ${
-                activeCategory === cat.key
-                  ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                  : "border-[#0a1a3a] text-[#3a5570] hover:border-[#4a90d9]/50 hover:text-[#5ba3e8]"
-              }`}
+              className={`px-5 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ${activeCategory === cat.key
+                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
+                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#4a90d9]/50 hover:text-[#5ba3e8]"
+                }`}
             >
               {cat.label}
             </Link>
@@ -169,9 +168,9 @@ export default async function Collection({
         ) : (
           /* Gallery Floor — Horizontal Scroll, MAGNETIC HOVER */
           <div className="flex-1 flex items-center pb-24 px-4">
-            <div 
+            <div
               className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
-              style={{ 
+              style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
               }}
@@ -188,10 +187,10 @@ export default async function Collection({
                   >
                     {/* MAGNETIC HOVER CONTAINER — stays grounded, glows */}
                     <div className="relative transition-all duration-500 ease-out">
-                      
+
                       {/* Ambient shadow — always there */}
                       <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/60 rounded-full blur-xl transition-all duration-500 group-hover:w-32 group-hover:blur-2xl" />
-                      
+
                       {/* Hover shadow — expands dramatically */}
                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/40 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-3xl group-hover:bg-[#4a90d9]/15" />
 
@@ -221,10 +220,10 @@ export default async function Collection({
 
                         {/* Glass sheen */}
                         <div className="absolute inset-0 bg-gradient-to-br from-[#4a90d9]/[0.04] via-transparent to-transparent pointer-events-none" />
-                        
+
                         {/* Extra sheen on hover — blue tint */}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#4a90d9]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                        
+
                         {/* Inner glow border on hover */}
                         <div className="absolute inset-0 border border-[#4a90d9]/0 group-hover:border-[#4a90d9]/30 transition-all duration-500 pointer-events-none" />
                       </div>

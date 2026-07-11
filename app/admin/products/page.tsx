@@ -139,11 +139,10 @@ export default function AdminProducts() {
 
               <button
                 onClick={() => togglePublish(product.id, product.is_published)}
-                className={`text-[10px] tracking-widest uppercase px-2 py-1 border transition-all ${
-                  product.is_published
-                    ? "border-[#4a90d9] text-[#4a90d9]"
-                    : "border-[#1a3a5a] text-[#1a3a5a]"
-                }`}
+                className={`text-[10px] tracking-widest uppercase px-2 py-1 border transition-all ${product.is_published
+                  ? "border-[#4a90d9] text-[#4a90d9]"
+                  : "border-[#1a3a5a] text-[#1a3a5a]"
+                  }`}
               >
                 {product.is_published ? "Live" : "Draft"}
               </button>

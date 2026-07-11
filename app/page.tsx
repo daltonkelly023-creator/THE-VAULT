@@ -1,13 +1,13 @@
-// app/page.tsx
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseServer";
 import Particles from "@/components/Particles";
 
 export const revalidate = 60;
 
 export default async function Home() {
   const { data: featured } = await supabase
+
     .from("products")
     .select("*")
     .eq("is_published", true)
@@ -30,7 +30,7 @@ export default async function Home() {
             THE VAULT
           </h1>
           <p className="text-lg text-[#5a7a9a] max-w-lg mb-10 font-light tracking-wide leading-relaxed">
-            Bespoke commissions from the atelier of master craftsmen. 
+            Bespoke commissions from the atelier of master craftsmen.
             Each piece forged once, never repeated.
           </p>
           <Link
@@ -50,7 +50,7 @@ export default async function Home() {
         <h2 className="text-center text-3xl font-serif text-[#8ab4e8] mb-16 tracking-widest">
           Selected Works
         </h2>
-        
+
         {featured && featured.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featured.map((piece) => {
