@@ -207,15 +207,7 @@ export default function EditProductForm({ product }: { product: Product }) {
               className="w-full bg-[#111] border border-[#1a1a1a] rounded px-4 py-3 text-sm focus:border-[#c9a96e] outline-none"
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-xs tracking-widest text-gray-500 uppercase">Designer</label>
-            <input
-              name="designer"
-              defaultValue={product.designer || ""}
-              placeholder="e.g. Elena Voss"
-              className="w-full bg-[#111] border border-[#1a1a1a] rounded px-4 py-3 text-sm focus:border-[#c9a96e] outline-none"
-            />
-          </div>
+      
         </div>
 
         {/* Stone + Carat */}
