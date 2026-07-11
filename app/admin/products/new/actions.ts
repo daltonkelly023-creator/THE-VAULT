@@ -17,7 +17,6 @@ export async function createProduct(formData: FormData) {
     price_cents,
     description: formData.get("description") as string,
     metal: formData.get("metal") as string,
-    designer: formData.get("designer") as string,
     stone: formData.get("stone") as string,
     carat: formData.get("carat") as string,
     length: formData.get("length") as string,

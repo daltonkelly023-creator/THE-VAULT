@@ -17,7 +17,6 @@ export async function updateProduct(formData: FormData) {
       price_cents: Math.round(parseFloat((formData.get("price") as string) || "0") * 100),
       description: formData.get("description") as string,
       metal: formData.get("metal") as string,
-      designer: formData.get("designer") as string,
       stone: formData.get("stone") as string,
       carat: formData.get("carat") as string,
       length: formData.get("length") as string,
