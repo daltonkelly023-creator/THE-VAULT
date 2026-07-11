@@ -80,7 +80,7 @@ export default async function PiecePage({ params }: { params: Promise<{ id: stri
               {/* Name & Price */}
               <div>
                 <h1 className="text-3xl font-light tracking-wider">{piece.name}</h1>
-                <p className="text-2xl text-[#c9a96e] mt-4">${(piece.price_cents / 100).toFixed(2)}</p>
+                <p className="text-2xl text-[#c9a96e] mt-4">${(piece.price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 {piece.price_type && (
                   <p className="text-xs text-gray-600 mt-1 tracking-wider">{piece.price_type}</p>
                 )}

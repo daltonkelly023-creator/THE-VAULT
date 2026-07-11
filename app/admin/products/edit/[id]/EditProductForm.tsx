@@ -104,7 +104,7 @@ export default function EditProductForm({ product }: { product: Product }) {
         )}
         <div className="flex-1">
           <h2 className="text-lg tracking-wider text-white">{product.name}</h2>
-          <p className="text-sm text-[#c9a96e] mt-1">${(product.price_cents / 100).toFixed(2)}</p>
+          <p className="text-sm text-[#c9a96e] mt-1">${(product.price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">
             {product.category} — {product.collection === "altera" ? "Atelier" : "Terra"}
           </p>

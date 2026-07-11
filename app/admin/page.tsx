@@ -75,7 +75,7 @@ export default async function AdminProductsPage() {
                   <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest">
                     {product.category} — {product.collection === "altera" ? "Atelier" : "Terra"}
                   </p>
-                  <p className="text-xs text-[#c9a96e] mt-1">${(product.price_cents / 100).toFixed(2)}</p>
+                  <p className="text-xs text-[#c9a96e] mt-1">${(product.price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
 
                 {/* Status */}
