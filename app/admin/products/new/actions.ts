@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 export async function createProduct(formData: FormData) {
   const price_cents = Math.round(
     parseFloat((formData.get("price") as string) || "0") * 100
-  );
+  ) || 0;
 
   const { error } = await supabase.from("products").insert({
     name: formData.get("name") as string,
@@ -15,23 +15,24 @@ export async function createProduct(formData: FormData) {
     collection: formData.get("collection") as string,
     asset_type: formData.get("asset_type") as string,
     price_cents,
-    description: formData.get("description") as string,
-    metal: formData.get("metal") as string,
-    stone: formData.get("stone") as string,
-    carat: formData.get("carat") as string,
-    length: formData.get("length") as string,
-    price_type: formData.get("price_type") as string,
-    story: formData.get("story") as string,
-    specifications: formData.get("specifications") as string,
+    description: formData.get("description") as string || null,
+    metal: formData.get("metal") as string || null,
+    stone: formData.get("stone") as string || null,
+    carat: formData.get("carat") as string || null,
+    story: formData.get("story") as string || null,
+    specifications: formData.get("specifications") as string || null,
     hero_image_path: (formData.get("hero_image_path") as string) || null,
-    gallery_paths: JSON.parse((formData.get("gallery_paths") as string) || "[]"),
+    gallery_paths: (() => {
+      const raw = formData.get("gallery_paths") as string;
+      if (!raw || raw === "") return [];
+      try { return JSON.parse(raw); } catch { return []; }
+    })(),
     is_published: false,
   });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/admin/products");
+  revalidatePath("/collection");
   redirect("/admin/products");
 }

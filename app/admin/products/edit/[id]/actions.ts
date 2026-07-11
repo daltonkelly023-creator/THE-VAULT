@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export async function updateProduct(formData: FormData) {
   const id = formData.get("id") as string;
-  
+
   const { error } = await supabase
     .from("products")
     .update({
@@ -14,24 +14,24 @@ export async function updateProduct(formData: FormData) {
       category: formData.get("category") as string,
       collection: formData.get("collection") as string,
       asset_type: formData.get("asset_type") as string,
-      price_cents: Math.round(parseFloat((formData.get("price") as string) || "0") * 100),
-      description: formData.get("description") as string,
-      metal: formData.get("metal") as string,
-      stone: formData.get("stone") as string,
-      carat: formData.get("carat") as string,
-      length: formData.get("length") as string,
-      price_type: formData.get("price_type") as string,
-      story: formData.get("story") as string,
-      specifications: formData.get("specifications") as string,
+      price_cents: Math.round(parseFloat((formData.get("price") as string) || "0") * 100) || 0,
+      description: formData.get("description") as string || null,
+      metal: formData.get("metal") as string || null,
+      stone: formData.get("stone") as string || null,
+      carat: formData.get("carat") as string || null,
+      story: formData.get("story") as string || null,
+      specifications: formData.get("specifications") as string || null,
       hero_image_path: (formData.get("hero_image_path") as string) || null,
-      gallery_paths: JSON.parse((formData.get("gallery_paths") as string) || "[]"),
+      gallery_paths: (() => {
+        const raw = formData.get("gallery_paths") as string;
+        if (!raw || raw === "") return [];
+        try { return JSON.parse(raw); } catch { return []; }
+      })(),
       is_published: formData.get("is_published") === "on",
     })
     .eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/admin/products");
   revalidatePath(`/piece/${id}`);
@@ -46,9 +46,7 @@ export async function deleteProduct(formData: FormData) {
     .delete()
     .eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/admin/products");
   redirect("/admin/products");

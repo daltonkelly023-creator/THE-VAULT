@@ -103,7 +103,7 @@ export default function NewProductPage() {
                 >
                   {collections.map((c) => (
                     <option key={c} value={c}>
-                      {c}
+                      {c === "altera" ? "Atelier — Workshop Crafted" : "Terra — Earth Sourced"}
                     </option>
                   ))}
                 </select>
@@ -152,8 +152,6 @@ export default function NewProductPage() {
               />
             </div>
 
-            
-
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs tracking-widest text-gray-500 uppercase">
@@ -174,33 +172,6 @@ export default function NewProductPage() {
                   placeholder="e.g. 2.5"
                   className="w-full bg-[#111] border border-[#1a1a1a] rounded px-4 py-3 text-sm focus:border-[#c9a96e] outline-none"
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs tracking-widest text-gray-500 uppercase">
-                  Length
-                </label>
-                <input
-                  name="length"
-                  placeholder="e.g. 18 inches"
-                  className="w-full bg-[#111] border border-[#1a1a1a] rounded px-4 py-3 text-sm focus:border-[#c9a96e] outline-none"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs tracking-widest text-gray-500 uppercase">
-                  Price Type
-                </label>
-                <select
-                  name="price_type"
-                  defaultValue="Fixed"
-                  className="w-full bg-[#111] border border-[#1a1a1a] rounded px-4 py-3 text-sm focus:border-[#c9a96e] outline-none"
-                >
-                  <option value="Fixed">Fixed</option>
-                  <option value="Starting at">Starting at</option>
-                  <option value="Estimate">Estimate</option>
-                </select>
               </div>
             </div>
 
