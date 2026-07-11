@@ -66,11 +66,10 @@ export default async function PiecePage({ params }: { params: Promise<{ id: stri
             <div className="space-y-8">
               {/* Collection badge */}
               <div className="flex items-center gap-3">
-                <span className={`text-[10px] tracking-[0.3em] uppercase px-3 py-1 border ${
-                  piece.collection === 'altera' 
-                    ? 'border-[#c9a96e] text-[#c9a96e]' 
+                <span className={`text-[10px] tracking-[0.3em] uppercase px-3 py-1 border ${piece.collection === 'altera'
+                    ? 'border-[#c9a96e] text-[#c9a96e]'
                     : 'border-gray-600 text-gray-400'
-                }`}>
+                  }`}>
                   {piece.collection === 'altera' ? 'Atelier — Workshop Crafted' : 'Terra — Earth Sourced'}
                 </span>
                 <span className="text-[10px] tracking-[0.3em] uppercase text-gray-600">
@@ -81,9 +80,6 @@ export default async function PiecePage({ params }: { params: Promise<{ id: stri
               {/* Name & Price */}
               <div>
                 <h1 className="text-3xl font-light tracking-wider">{piece.name}</h1>
-                {piece.designer && (
-                  <p className="text-xs text-gray-500 tracking-widest mt-2 uppercase">Designed by {piece.designer}</p>
-                )}
                 <p className="text-2xl text-[#c9a96e] mt-4">${(piece.price_cents / 100).toFixed(2)}</p>
                 {piece.price_type && (
                   <p className="text-xs text-gray-600 mt-1 tracking-wider">{piece.price_type}</p>
