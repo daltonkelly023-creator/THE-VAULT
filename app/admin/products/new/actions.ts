@@ -2,14 +2,13 @@
 
 import { supabase } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export async function createProduct(formData: FormData) {
   const price_cents = Math.round(
     parseFloat((formData.get("price") as string) || "0") * 100
   ) || 0;
 
-  const { error } = await supabase.from("products").insert({
+  const { data, error } = await supabase.from("products").insert({
     name: formData.get("name") as string,
     category: formData.get("category") as string,
     collection: formData.get("collection") as string,
@@ -28,11 +27,15 @@ export async function createProduct(formData: FormData) {
       try { return JSON.parse(raw); } catch { return []; }
     })(),
     is_published: false,
-  });
+  }).select();
 
   if (error) throw new Error(error.message);
 
+  // Revalidate EVERYTHING
   revalidatePath("/admin/products");
   revalidatePath("/collection");
-  redirect("/admin/products");
+  revalidatePath("/");
+  
+  // Return the created product ID
+  return { success: true, id: data?.[0]?.id };
 }
