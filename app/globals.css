@@ -2,65 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Deep-sea bioluminescence — slow, breathing, drifting */
-@keyframes biolum-breathe {
-  0%, 100% { 
-    opacity: 0.1; 
-    transform: scale(0.8) translateX(0px); 
-  }
-  25% { 
-    opacity: 0.6; 
-    transform: scale(1.1) translateX(3px); 
-  }
-  50% { 
-    opacity: 0.3; 
-    transform: scale(0.9) translateX(-2px); 
-  }
-  75% { 
-    opacity: 0.8; 
-    transform: scale(1.05) translateX(1px); 
-  }
-}
-
-@keyframes biolum-drift {
-  0%, 100% { 
-    transform: translate(0, 0); 
-  }
-  33% { 
-    transform: translate(8px, -5px); 
-  }
-  66% { 
-    transform: translate(-6px, 3px); 
-  }
-}
-
-.animate-biolum {
-  animation: 
-    biolum-breathe var(--breathe-dur, 5s) ease-in-out infinite,
-    biolum-drift var(--drift-dur, 12s) ease-in-out infinite;
-  animation-delay: var(--breathe-del, 0s), var(--drift-del, 0s);
-}
-
-/* Hide scrollbar */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Base */
-:root {
-  --background: #0a0a0a;
-  --foreground: #e5e5e5;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  cursor: none;
 }
 
-html {
-  scroll-behavior: smooth;
+@media (pointer: coarse) {
+  body {
+    cursor: auto !important;
+  }
+}
+
+/* Magnetic button effect */
+.magnetic-button {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.magnetic-button:hover {
+  transform: scale(1.02);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c9a96e;
 }
