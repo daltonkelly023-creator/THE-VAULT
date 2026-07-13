@@ -40,7 +40,7 @@ export default async function PiecePage({ params }: { params: Promise<{ id: stri
               <div className="aspect-square bg-[#111] border border-[#1a1a1a] overflow-hidden">
                 {piece.hero_image_path ? (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${piece.hero_image_path}`}
+                    src={`https://pynjcdeamdumlkffrmjm.supabase.co/storage/v1/object/public/vault-assets/${piece.hero_image_path}`}
                     alt={piece.name}
                     className="w-full h-full object-cover"
                   />
