@@ -1,198 +1,153 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseServer";
 
-type Commission = {
-  id: string;
-  name: string;
-  email: string;
-  piece_name: string;
-  collection: string;
-  configuration_summary: string;
-  status: "NEW" | "CONTACTED" | "QUOTED" | "SOLD" | "ARCHIVED";
-  notes: string;
-  created_at: string;
-};
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-const statusColors: Record<string, string> = {
-  NEW: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  CONTACTED: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  QUOTED: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  SOLD: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  ARCHIVED: "bg-[#1a3a5a]/50 text-[#3a5570] border-[#0a1a3a]",
-};
+export default function CommissionPage() {
+  const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [formError, setFormError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-export default function CommissionsDashboard() {
-  const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("ALL");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setFormState("submitting");
+    setFormError("");
+    setEmailError("");
 
-  useEffect(() => {
-    fetchCommissions();
-  }, []);
+    const formData = new FormData(e.currentTarget);
+    const email = (formData.get("email") as string).trim();
+    const name = (formData.get("name") as string).trim();
 
-  async function fetchCommissions() {
-    const { data } = await supabase
-      .from("commissions")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setCommissions(data || []);
-    setLoading(false);
-  }
+    // Mandatory email validation
+    if (!email) {
+      setEmailError("Email is required");
+      setFormState("error");
+      return;
+    }
 
-  async function updateStatus(id: string, status: string) {
-    await supabase.from("commissions").update({ status }).eq("id", id);
-    setCommissions((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: status as any } : c))
-    );
-  }
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      setFormState("error");
+      return;
+    }
 
-  async function updateNotes(id: string, notes: string) {
-    await supabase.from("commissions").update({ notes }).eq("id", id);
-  }
+    if (!name) {
+      setFormError("Name is required");
+      setFormState("error");
+      return;
+    }
 
-  const filtered =
-    filter === "ALL"
-      ? commissions
-      : commissions.filter((c) => c.status === filter);
+    const data = {
+      name,
+      email,
+      message: formData.get("message"),
+      pieceName: "General Inquiry",
+      collection: "N/A",
+    };
 
-  const counts = {
-    ALL: commissions.length,
-    NEW: commissions.filter((c) => c.status === "NEW").length,
-    CONTACTED: commissions.filter((c) => c.status === "CONTACTED").length,
-    QUOTED: commissions.filter((c) => c.status === "QUOTED").length,
-    SOLD: commissions.filter((c) => c.status === "SOLD").length,
-  };
+    try {
+      const res = await fetch("/api/commission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
-        <p className="text-[#3a5570] tracking-widest text-sm">Loading commissions...</p>
-      </main>
-    );
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed to send");
+      }
+
+      setFormState("success");
+    } catch (err: any) {
+      setFormState("error");
+      setFormError(err.message || "Something went wrong");
+    }
   }
 
   return (
-    <main className="min-h-screen bg-[#02040a] text-[#e5e5e5] pt-16">
-      {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#02040a]/90 backdrop-blur-sm border-b border-[#0a1a3a]">
-        <Link href="/admin" className="text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase">
-          ← Admin
-        </Link>
-        <span className="text-[#8ab4e8] font-serif tracking-widest text-sm">COMMISSION DASHBOARD</span>
-        <span className="text-xs text-[#3a5570]">{counts.ALL} total</span>
+    <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5] relative overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d0d] to-[#0a0a0a]" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {(["ALL", "NEW", "CONTACTED", "QUOTED", "SOLD"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-4 py-2 text-[10px] tracking-widest uppercase border transition-all duration-300 ${filter === s
-                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
-                }`}
-            >
-              {s} {counts[s as keyof typeof counts] > 0 && `(${counts[s as keyof typeof counts]})`}
-            </button>
-          ))}
-        </div>
+      {/* NAV */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 border-b border-[#1a1a1a]/50 backdrop-blur-sm bg-[#0a0a0a]/80">
+        <Link href="/" className="text-[#c9a96e] text-sm tracking-[0.4em] font-light uppercase">Atelier</Link>
+        <nav className="flex gap-8 text-xs tracking-[0.2em] text-gray-500">
+          <Link href="/collection" className="hover:text-[#c9a96e] transition-colors">Showroom</Link>
+          <Link href="/commission" className="text-[#c9a96e]">Commission</Link>
+        </nav>
+      </header>
 
-        {/* Table */}
-        {filtered.length === 0 ? (
-          <p className="text-center text-[#3a5570] py-24">No commissions found.</p>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map((c) => (
-              <div
-                key={c.id}
-                className="border border-[#0a1a3a] hover:border-[#1a3a5a] transition-all duration-300"
-              >
-                {/* Row */}
-                <div
-                  className="flex items-center justify-between px-4 py-3 cursor-pointer"
-                  onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
-                >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <span className={`text-[10px] px-2 py-1 border ${statusColors[c.status]}`}>
-                      {c.status}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-sm text-[#8ab4e8] truncate">{c.name}</p>
-                      <p className="text-[10px] text-[#3a5570] truncate">{c.piece_name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[10px] text-[#3a5570] hidden sm:block">
-                      {new Date(c.created_at).toLocaleDateString()}
-                    </span>
-                    <span className="text-[#3a5570] text-lg">
-                      {expandedId === c.id ? "−" : "+"}
-                    </span>
-                  </div>
-                </div>
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24">
+        <h1 className="text-4xl md:text-5xl font-serif text-[#c9a96e] text-center mb-4 tracking-widest">
+          Commission
+        </h1>
+        <p className="text-center text-gray-600 mb-12 text-sm tracking-wide">
+          Direct inquiries to the atelier.
+        </p>
 
-                {/* Expanded Details */}
-                {expandedId === c.id && (
-                  <div className="border-t border-[#0a1a3a] px-4 py-4 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                      <div>
-                        <p className="text-[#3a5570] tracking-widest uppercase mb-1">Email</p>
-                        <p className="text-[#5a7a9a]">{c.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#3a5570] tracking-widest uppercase mb-1">Collection</p>
-                        <p className="text-[#5a7a9a] capitalize">{c.collection || "—"}</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-[#3a5570] tracking-widest uppercase mb-1">Configuration</p>
-                      <pre className="text-[10px] text-[#5a7a9a] bg-[#02040a] border border-[#0a1a3a] p-3 overflow-x-auto whitespace-pre-wrap">
-                        {c.configuration_summary}
-                      </pre>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="flex-1">
-                        <p className="text-[#3a5570] tracking-widest uppercase mb-2">Status</p>
-                        <div className="flex flex-wrap gap-2">
-                          {(["NEW", "CONTACTED", "QUOTED", "SOLD", "ARCHIVED"] as const).map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => updateStatus(c.id, s)}
-                              className={`px-3 py-1.5 text-[10px] tracking-widest uppercase border transition-all ${c.status === s
-                                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#1a3a5a]"
-                                }`}
-                            >
-                              {s}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-[#3a5570] tracking-widest uppercase mb-2">Notes</p>
-                      <textarea
-                        defaultValue={c.notes}
-                        onBlur={(e) => updateNotes(c.id, e.target.value)}
-                        placeholder="Add internal notes..."
-                        className="w-full bg-[#02040a] border border-[#0a1a3a] px-3 py-2 text-xs text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors resize-none h-20"
-                      />
-                    </div>
-                  </div>
-                )}
+        <div className="w-full max-w-md">
+          {formState === "success" ? (
+            <div className="border border-[#c9a96e] p-8 text-center bg-[#0a0a0a]/80 backdrop-blur-sm">
+              <p className="text-[#c9a96e] font-serif text-xl mb-2">Request Received</p>
+              <p className="text-gray-500 text-sm">A master jeweler will contact you within 24 hours.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-xs text-gray-600 tracking-widest uppercase mb-2">Name <span className="text-[#c9a96e]">*</span></label>
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  className="w-full bg-[#111] border border-[#1a1a1a] px-4 py-3 text-[#e5e5e5] focus:border-[#c9a96e] focus:outline-none transition-colors"
+                />
               </div>
-            ))}
-          </div>
-        )}
+              <div>
+                <label className="block text-xs text-gray-600 tracking-widest uppercase mb-2">Email <span className="text-[#c9a96e]">*</span></label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  className={`w-full bg-[#111] border px-4 py-3 text-[#e5e5e5] focus:outline-none transition-colors ${emailError ? 'border-red-800 focus:border-red-600' : 'border-[#1a1a1a] focus:border-[#c9a96e]'}`}
+                />
+                {emailError && <p className="text-red-400 text-xs mt-2">{emailError}</p>}
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 tracking-widest uppercase mb-2">Message</label>
+                <textarea
+                  name="message"
+                  rows={5}
+                  className="w-full bg-[#111] border border-[#1a1a1a] px-4 py-3 text-[#e5e5e5] focus:border-[#c9a96e] focus:outline-none transition-colors resize-none"
+                />
+              </div>
+
+              {formError && !emailError && <p className="text-red-400 text-xs">{formError}</p>}
+
+              <button
+                type="submit"
+                disabled={formState === "submitting"}
+                className="w-full py-4 bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#b8985d] transition-colors tracking-[0.2em] text-sm uppercase font-medium disabled:opacity-50"
+              >
+                {formState === "submitting" ? "Sending..." : "Send Inquiry"}
+              </button>
+            </form>
+          )}
+
+          <p className="text-center text-gray-700 text-xs mt-8">
+            Or email directly:{" "}
+            <a href="mailto:inquiries@atelier.vault" className="text-[#c9a96e] hover:text-white transition-colors border-b border-[#c9a96e]/50 hover:border-white pb-0.5">
+              inquiries@atelier.vault
+            </a>
+          </p>
+        </div>
       </div>
     </main>
   );

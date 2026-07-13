@@ -18,10 +18,9 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-hidden">
-      <CustomCursorWrapper />
       <Particles />
 
-      {/* NAV */}
+      {/* NAV — Only Showroom + Commission */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 border-b border-[#1a1a1a]/50 backdrop-blur-sm bg-[#0a0a0a]/80">
         <Link href="/" className="text-[#c9a96e] text-sm tracking-[0.4em] font-light uppercase">
           Atelier
@@ -29,50 +28,67 @@ export default async function HomePage() {
         <nav className="flex gap-8 text-xs tracking-[0.2em] text-gray-500">
           <Link href="/collection" className="hover:text-[#c9a96e] transition-colors">Showroom</Link>
           <Link href="/commission" className="hover:text-[#c9a96e] transition-colors">Commission</Link>
-          <Link href="/contact" className="hover:text-[#c9a96e] transition-colors">Contact</Link>
-          <Link href="/admin/products" className="hover:text-[#c9a96e] transition-colors">Admin</Link>
         </nav>
       </header>
 
-      {/* HERO — Fullscreen */}
-      <section className="h-screen w-full relative flex items-center justify-center">
-        {/* Background product image */}
-        <div className="absolute inset-0 flex items-center justify-center">
+      {/* HERO */}
+      <section className="h-screen w-full relative flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
           {heroPiece?.hero_image_path ? (
             <img
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPiece.hero_image_path}`}
               alt={heroPiece.name}
-              className="w-[50vw] h-[50vh] object-contain opacity-40 hover:opacity-60 transition-opacity duration-1000"
+              className="w-full h-full object-cover opacity-30 scale-110"
             />
           ) : (
-            <div className="w-[40vw] h-[40vh] bg-[#111] border border-[#1a1a1a] flex items-center justify-center">
-              <span className="text-gray-700 text-xs tracking-widest">THE VAULT</span>
-            </div>
+            <div className="w-full h-full bg-[#0a0a0a]" />
           )}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/60 via-[#0a0a0a]/40 to-[#0a0a0a]/90" />
         </div>
 
-        {/* Hero text */}
-        <div className="relative z-10 text-center">
+        <div className="relative z-10 text-center px-4">
           <AnimatedSection>
-            <p className="text-[10px] tracking-[0.5em] text-gray-500 uppercase mb-6">
+            <p className="text-[10px] tracking-[0.5em] text-gray-400 uppercase mb-8">
               {heroPiece?.collection === "altera" ? "Atelier — Workshop Crafted" : "Terra — Earth Sourced"}
             </p>
           </AnimatedSection>
-          
+
           <AnimatedSection delay={0.2}>
-            <h1 className="text-[15vw] md:text-[12vw] font-light tracking-[0.15em] text-[#c9a96e] leading-none">
-              THE VAULT
-            </h1>
+            <div className="relative inline-block">
+              <h1 
+                className="text-[18vw] md:text-[14vw] font-light tracking-[0.12em] leading-none select-none"
+                style={{
+                  backgroundImage: heroPiece?.hero_image_path 
+                    ? `url(${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPiece.hero_image_path})`
+                    : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'brightness(1.3) contrast(1.1)',
+                }}
+              >
+                THE VAULT
+              </h1>
+              {!heroPiece?.hero_image_path && (
+                <h1 className="text-[18vw] md:text-[14vw] font-light tracking-[0.12em] text-[#c9a96e] leading-none absolute inset-0">
+                  THE VAULT
+                </h1>
+              )}
+            </div>
           </AnimatedSection>
 
-          <AnimatedSection delay={0.4}>
-            <p className="mt-8 text-gray-400 text-sm tracking-[0.2em] max-w-md mx-auto leading-relaxed">
+          <AnimatedSection delay={0.5}>
+            <p className="mt-10 text-gray-400 text-sm tracking-[0.2em] max-w-md mx-auto leading-relaxed">
               Bespoke jewelry, forged to order. Configure your piece and commission directly.
             </p>
           </AnimatedSection>
 
-          <AnimatedSection delay={0.6}>
-            <div className="mt-12">
+          {/* MOVED DOWN — more margin-top */}
+          <AnimatedSection delay={0.7}>
+            <div className="mt-16">
               <Link
                 href="/collection"
                 className="magnetic-button inline-block px-12 py-5 border border-[#c9a96e] text-[#c9a96e] text-xs tracking-[0.3em] uppercase hover:bg-[#c9a96e] hover:text-[#0a0a0a] transition-all duration-700"
@@ -83,8 +99,7 @@ export default async function HomePage() {
           </AnimatedSection>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
           <span className="text-[10px] text-gray-600 tracking-widest uppercase">Scroll</span>
           <div className="w-px h-8 bg-gradient-to-b from-[#c9a96e] to-transparent animate-pulse" />
         </div>
@@ -136,20 +151,15 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <AnimatedSection>
             <div className="aspect-[4/5] bg-[#111] border border-[#1a1a1a] overflow-hidden">
-              <img
-                src="/brand-story.jpg"
-                alt="Craftsmanship"
-                className="w-full h-full object-cover opacity-80"
-              />
+              <img src="/brand-story.jpg" alt="Craftsmanship" className="w-full h-full object-cover opacity-80" />
             </div>
           </AnimatedSection>
-          
+
           <AnimatedSection delay={0.3}>
             <div className="space-y-8">
               <p className="text-[10px] tracking-[0.5em] text-[#c9a96e] uppercase">The Atelier</p>
               <h2 className="text-4xl font-light tracking-wider leading-tight">
-                Where Raw Earth<br />
-                Meets Human Hand
+                Where Raw Earth<br />Meets Human Hand
               </h2>
               <p className="text-gray-400 text-sm leading-relaxed max-w-md">
                 Every piece begins as a conversation. Between the stone and the setting, 
@@ -169,7 +179,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* VIDEO PLACEHOLDER */}
+      {/* VIDEO */}
       <section className="py-32 px-8 border-t border-[#1a1a1a]">
         <div className="max-w-5xl mx-auto text-center">
           <AnimatedSection>
@@ -182,26 +192,14 @@ export default async function HomePage() {
 
           <AnimatedSection delay={0.2}>
             <div className="relative aspect-video bg-[#111] border border-[#1a1a1a] rounded overflow-hidden group">
-              {/* Video placeholder — buyer replaces src */}
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                poster="/video-poster.jpg"
-                className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700"
-              >
+              <video autoPlay muted loop playsInline poster="/video-poster.jpg" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700">
                 <source src="/craftsmanship.mp4" type="video/mp4" />
               </video>
-              
-              {/* Play overlay */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-20 h-20 rounded-full border border-[#c9a96e]/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                   <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-[#c9a96e] border-b-8 border-b-transparent ml-1" />
                 </div>
               </div>
-              
-              {/* Caption */}
               <div className="absolute bottom-6 left-6">
                 <p className="text-[10px] text-gray-500 tracking-widest uppercase">Watch the process</p>
               </div>
@@ -210,7 +208,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* PRESS / AS FEATURED IN */}
+      {/* PRESS */}
       <section className="py-24 px-8 border-t border-[#1a1a1a]">
         <div className="max-w-5xl mx-auto text-center">
           <AnimatedSection>
@@ -230,19 +228,9 @@ export default async function HomePage() {
               New pieces, private viewings, and commission openings. No frequency, no noise. 
               Only when it matters.
             </p>
-            
             <form className="flex gap-4">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="flex-1 bg-[#111] border border-[#1a1a1a] rounded px-6 py-4 text-sm text-white placeholder-gray-600 focus:border-[#c9a96e] outline-none transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-8 py-4 bg-[#c9a96e] text-black text-xs tracking-widest uppercase font-medium rounded hover:bg-[#b8985d] transition-colors"
-              >
-                Subscribe
-              </button>
+              <input type="email" placeholder="your@email.com" className="flex-1 bg-[#111] border border-[#1a1a1a] rounded px-6 py-4 text-sm text-white placeholder-gray-600 focus:border-[#c9a96e] outline-none transition-colors" />
+              <button type="submit" className="px-8 py-4 bg-[#c9a96e] text-black text-xs tracking-widest uppercase font-medium rounded hover:bg-[#b8985d] transition-colors">Subscribe</button>
             </form>
             <p className="text-gray-700 text-[10px] mt-4 tracking-wider">Unsubscribe anytime. We never share your data.</p>
           </AnimatedSection>
@@ -254,29 +242,16 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
             <h4 className="text-[#c9a96e] text-sm tracking-[0.4em] uppercase mb-4">Atelier</h4>
-            <p className="text-gray-600 text-xs leading-relaxed">
-              Bespoke jewelry, forged to order. Each piece commissioned individually. No two are alike.
-            </p>
+            <p className="text-gray-600 text-xs leading-relaxed">Bespoke jewelry, forged to order. Each piece commissioned individually. No two are alike.</p>
           </div>
-
           <div>
             <h5 className="text-gray-500 text-xs tracking-[0.2em] uppercase mb-4">Contact</h5>
-            <p className="text-gray-600 text-xs leading-relaxed">
-              inquiries@atelier.vault<br />
-              +1 (555) 234-5678<br />
-              By appointment only
-            </p>
+            <p className="text-gray-600 text-xs leading-relaxed">inquiries@atelier.vault<br />+1 (555) 234-5678<br />By appointment only</p>
           </div>
-
           <div>
             <h5 className="text-gray-500 text-xs tracking-[0.2em] uppercase mb-4">Showroom</h5>
-            <p className="text-gray-600 text-xs leading-relaxed">
-              47 Bond Street<br />
-              Mayfair, London W1S 1DE<br />
-              United Kingdom
-            </p>
+            <p className="text-gray-600 text-xs leading-relaxed">47 Bond Street<br />Mayfair, London W1S 1DE<br />United Kingdom</p>
           </div>
-
           <div>
             <h5 className="text-gray-500 text-xs tracking-[0.2em] uppercase mb-4">Follow</h5>
             <div className="flex gap-4 mb-6">
@@ -287,9 +262,9 @@ export default async function HomePage() {
               <a href="#" className="text-gray-700 hover:text-gray-500 text-[10px] transition-colors">Privacy</a>
               <a href="#" className="text-gray-700 hover:text-gray-500 text-[10px] transition-colors">Terms</a>
             </div>
+            <Link href="/admin" className="text-gray-800 hover:text-gray-600 text-[10px] transition-colors mt-4 block tracking-widest">Staff Access</Link>
           </div>
         </div>
-
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-[#1a1a1a] flex justify-between items-center">
           <span className="text-gray-700 text-[10px] tracking-widest">© 2024 Atelier. All rights reserved.</span>
           <span className="text-gray-800 text-[10px] tracking-widest">Crafted with intention</span>
@@ -297,9 +272,4 @@ export default async function HomePage() {
       </footer>
     </div>
   );
-}
-
-// Client wrapper for cursor
-function CustomCursorWrapper() {
-  return null; // Will be hydrated by client component
 }

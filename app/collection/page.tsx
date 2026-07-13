@@ -1,9 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseServer";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import Skeleton from "@/components/Skeleton";
-
-export const revalidate = 60;
 
 const categories = [
   { key: "all", label: "All" },
@@ -14,40 +15,104 @@ const categories = [
   { key: "watch", label: "Timepieces" },
 ];
 
-const categoryColors: Record<string, { glow: string; text: string }> = {
-  ring: { glow: "shadow-blue-500/30", text: "text-blue-300" },
-  necklace: { glow: "shadow-amber-500/30", text: "text-amber-300" },
-  bracelet: { glow: "shadow-emerald-500/30", text: "text-emerald-300" },
-  earring: { glow: "shadow-rose-500/30", text: "text-rose-300" },
-  watch: { glow: "shadow-slate-400/30", text: "text-slate-300" },
+const categoryColors: Record<string, { glow: string; text: string; border: string }> = {
+  ring: { glow: "shadow-blue-500/30", text: "text-blue-300", border: "border-blue-500/30" },
+  necklace: { glow: "shadow-amber-500/30", text: "text-amber-300", border: "border-amber-500/30" },
+  bracelet: { glow: "shadow-emerald-500/30", text: "text-emerald-300", border: "border-emerald-500/30" },
+  earring: { glow: "shadow-rose-500/30", text: "text-rose-300", border: "border-rose-500/30" },
+  watch: { glow: "shadow-slate-400/30", text: "text-slate-300", border: "border-slate-400/30" },
 };
 
-export default async function Collection({
-  searchParams,
-}: {
-  searchParams: { category?: string };
-}) {
-  const activeCategory = searchParams.category || "all";
+/* ---------- ORNATE CORNER FRAME SVG ---------- */
+function OrnateFrame({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      {/* Top-left corner */}
+      <path
+        d="M 0 15 Q 0 0 15 0 L 25 0 L 25 2 L 15 2 Q 2 2 2 15 L 2 25 L 0 25 Z"
+        fill="currentColor"
+        opacity="0.6"
+      />
+      <path
+        d="M 0 8 Q 0 0 8 0 L 12 0 L 12 1.5 L 8 1.5 Q 1.5 1.5 1.5 8 L 1.5 12 L 0 12 Z"
+        fill="currentColor"
+        opacity="0.4"
+      />
+      {/* Top-right corner */}
+      <path
+        d="M 100 15 Q 100 0 85 0 L 75 0 L 75 2 L 85 2 Q 98 2 98 15 L 98 25 L 100 25 Z"
+        fill="currentColor"
+        opacity="0.6"
+      />
+      <path
+        d="M 100 8 Q 100 0 92 0 L 88 0 L 88 1.5 L 92 1.5 Q 98.5 1.5 98.5 8 L 98.5 12 L 100 12 Z"
+        fill="currentColor"
+        opacity="0.4"
+      />
+      {/* Bottom-left corner */}
+      <path
+        d="M 0 85 Q 0 100 15 100 L 25 100 L 25 98 L 15 98 Q 2 98 2 85 L 2 75 L 0 75 Z"
+        fill="currentColor"
+        opacity="0.6"
+      />
+      <path
+        d="M 0 92 Q 0 100 8 100 L 12 100 L 12 98.5 L 8 98.5 Q 1.5 98.5 1.5 92 L 1.5 88 L 0 88 Z"
+        fill="currentColor"
+        opacity="0.4"
+      />
+      {/* Bottom-right corner */}
+      <path
+        d="M 100 85 Q 100 100 85 100 L 75 100 L 75 98 L 85 98 Q 98 98 98 85 L 98 75 L 100 75 Z"
+        fill="currentColor"
+        opacity="0.6"
+      />
+      <path
+        d="M 100 92 Q 100 100 92 100 L 88 100 L 88 98.5 L 92 98.5 Q 98.5 98.5 98.5 92 L 98.5 88 L 100 88 Z"
+        fill="currentColor"
+        opacity="0.4"
+      />
+      {/* Decorative flourishes */}
+      <circle cx="5" cy="5" r="1" fill="currentColor" opacity="0.3" />
+      <circle cx="95" cy="5" r="1" fill="currentColor" opacity="0.3" />
+      <circle cx="5" cy="95" r="1" fill="currentColor" opacity="0.3" />
+      <circle cx="95" cy="95" r="1" fill="currentColor" opacity="0.3" />
+    </svg>
+  );
+}
 
-  let query = supabase
-    .from("products")
-    .select("*")
-    .eq("is_published", true)
-    .order("created_at", { ascending: false });
+export default function Collection() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [error, setError] = useState("");
 
-  if (activeCategory !== "all") {
-    query = query.eq("category", activeCategory);
-  }
+  useEffect(() => {
+    async function fetchProducts() {
+      let query = supabase
+        .from("products")
+        .select("*")
+        .eq("is_published", true)
+        .order("created_at", { ascending: false });
 
-  const { data: products, error } = await query;
+      if (activeCategory !== "all") {
+        query = query.eq("category", activeCategory);
+      }
 
-  if (error) {
-    return (
-      <main className="min-h-screen bg-[#02040a] flex items-center justify-center">
-        <p className="text-[#444]">Error loading collection.</p>
-      </main>
-    );
-  }
+      const { data, error } = await query;
+
+      if (error) {
+        setError("Error loading collection.");
+      } else {
+        setProducts(data || []);
+      }
+      setLoading(false);
+    }
+    fetchProducts();
+  }, [activeCategory]);
 
   const getImageUrl = (path: string) => {
     if (!path) return null;
@@ -56,75 +121,34 @@ export default async function Collection({
   };
 
   return (
-    <main className="min-h-screen bg-[#02040a] text-[#e5e5e5] relative overflow-hidden">
-      {/* DEEP OCEAN ATMOSPHERE */}
+    <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5] relative overflow-hidden">
+      {/* Background atmosphere */}
       <div className="fixed inset-0 pointer-events-none">
-        {/* Base gradient — abyssal blue-black */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#02040a] via-[#040818] to-[#02040a]" />
-
-        {/* Subtle depth layers */}
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#061025]/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#010208]/80 to-transparent" />
-
-        {/* BIOLUMINESCENT FIELD — 18 dots, 40% red, slow breathing drift */}
-        {(() => {
-          const particles = [
-            // Blue (60%) — deep, slow, wide drift
-            { top: '15%', left: '12%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', breathe: '5.2s', bDel: '0s', drift: '14s', dDel: '0s' },
-            { top: '22%', left: '78%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', breathe: '6.8s', bDel: '1.2s', drift: '18s', dDel: '3s' },
-            { top: '35%', left: '25%', size: 'w-1.5 h-1.5', color: 'bg-[#3d7bc7]', breathe: '4.5s', bDel: '2.1s', drift: '12s', dDel: '1s' },
-            { top: '18%', left: '55%', size: 'w-0.5 h-0.5', color: 'bg-[#6bb3f0]', breathe: '7.3s', bDel: '0.7s', drift: '20s', dDel: '5s' },
-            { top: '45%', left: '88%', size: 'w-1 h-1', color: 'bg-[#4a90d9]', breathe: '5.8s', bDel: '3.4s', drift: '15s', dDel: '2s' },
-            { top: '62%', left: '15%', size: 'w-0.5 h-0.5', color: 'bg-[#5ba3e8]', breathe: '6.2s', bDel: '1.8s', drift: '16s', dDel: '4s' },
-            { top: '28%', left: '42%', size: 'w-1 h-1', color: 'bg-[#3d7bc7]', breathe: '4.9s', bDel: '0.3s', drift: '13s', dDel: '6s' },
-            { top: '55%', left: '70%', size: 'w-1.5 h-1.5', color: 'bg-[#6bb3f0]', breathe: '5.5s', bDel: '2.7s', drift: '17s', dDel: '1.5s' },
-            { top: '72%', left: '35%', size: 'w-0.5 h-0.5', color: 'bg-[#4a90d9]', breathe: '7.8s', bDel: '4.1s', drift: '22s', dDel: '7s' },
-            { top: '38%', left: '92%', size: 'w-1 h-1', color: 'bg-[#5ba3e8]', breathe: '6.1s', bDel: '1.1s', drift: '14s', dDel: '3.5s' },
-            { top: '82%', left: '60%', size: 'w-0.5 h-0.5', color: 'bg-[#3d7bc7]', breathe: '5.4s', bDel: '3.8s', drift: '19s', dDel: '2.5s' },
-
-            // Red (40%) — warmer, slightly faster, more erratic
-            { top: '25%', left: '88%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '3.8s', bDel: '0.5s', drift: '11s', dDel: '1s' },
-            { top: '48%', left: '30%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', breathe: '3.2s', bDel: '2.3s', drift: '10s', dDel: '4s' },
-            { top: '68%', left: '75%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', breathe: '4.1s', bDel: '1.5s', drift: '13s', dDel: '2s' },
-            { top: '12%', left: '45%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '3.5s', bDel: '3.1s', drift: '9s', dDel: '5s' },
-            { top: '58%', left: '52%', size: 'w-1.5 h-1.5', color: 'bg-[#d45555]', breathe: '3.9s', bDel: '0.9s', drift: '12s', dDel: '3s' },
-            { top: '85%', left: '20%', size: 'w-0.5 h-0.5', color: 'bg-[#b83030]', breathe: '3.3s', bDel: '2.8s', drift: '8s', dDel: '6s' },
-            { top: '32%', left: '65%', size: 'w-1 h-1', color: 'bg-[#c94040]', breathe: '4.4s', bDel: '4.2s', drift: '11s', dDel: '2s' },
-          ];
-
-          return particles.map((p, i) => (
-            <div
-              key={i}
-              className={`absolute ${p.size} ${p.color} rounded-full animate-biolum`}
-              style={{
-                top: p.top,
-                left: p.left,
-                '--breathe-dur': p.breathe,
-                '--breathe-del': p.bDel,
-                '--drift-dur': p.drift,
-                '--drift-del': p.dDel,
-              } as React.CSSProperties}
-            />
-          ));
-        })()}
-
-        {/* Subtle light rays from above */}
-        <div className="absolute top-0 left-1/4 w-px h-[300px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
-        <div className="absolute top-0 left-1/2 w-px h-[400px] bg-gradient-to-b from-[#5ba3e8]/8 to-transparent" />
-        <div className="absolute top-0 left-3/4 w-px h-[250px] bg-gradient-to-b from-[#4a90d9]/5 to-transparent" />
-
-        {/* Floor glow — bioluminescent sediment */}
-        <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-[#0a1a3a]/30 via-[#061025]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d0d] to-[#0a0a0a]" />
+        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#111]/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#050505]/60 to-transparent" />
       </div>
 
+      {/* NAV HEADER — Same as homepage */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 border-b border-[#1a1a1a]/50 backdrop-blur-sm bg-[#0a0a0a]/80">
+        <Link href="/" className="text-[#c9a96e] text-sm tracking-[0.4em] font-light uppercase">
+          Atelier
+        </Link>
+        <nav className="flex gap-8 text-xs tracking-[0.2em] text-gray-500">
+          <Link href="/collection" className="text-[#c9a96e]">Showroom</Link>
+          <Link href="/commission" className="hover:text-[#c9a96e] transition-colors">Commission</Link>
+          <Link href="/contact" className="hover:text-[#c9a96e] transition-colors">Contact</Link>
+        </nav>
+      </header>
+
       {/* Content */}
-      <div className="relative min-h-screen flex flex-col">
+      <div className="relative min-h-screen flex flex-col pt-24">
         {/* Header */}
         <div className="text-center pt-20 pb-10">
-          <h1 className="text-5xl md:text-6xl font-serif text-[#8ab4e8] tracking-widest mb-3">
+          <h1 className="text-5xl md:text-6xl font-serif text-[#c9a96e] tracking-widest mb-3">
             The Showroom
           </h1>
-          <p className="text-xs text-[#3a5570] tracking-[0.3em] uppercase">
+          <p className="text-xs text-gray-600 tracking-[0.3em] uppercase">
             Select a category to filter
           </p>
         </div>
@@ -132,28 +156,29 @@ export default async function Collection({
         {/* Category Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-16 px-4">
           {categories.map((cat) => (
-            <Link
+            <button
               key={cat.key}
-              href={cat.key === "all" ? "/collection" : `/collection?category=${cat.key}`}
+              onClick={() => {
+                setActiveCategory(cat.key);
+                setLoading(true);
+              }}
               className={`px-5 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ${activeCategory === cat.key
-                ? "border-[#4a90d9] text-[#8ab4e8] bg-[#4a90d9]/10"
-                : "border-[#0a1a3a] text-[#3a5570] hover:border-[#4a90d9]/50 hover:text-[#5ba3e8]"
+                ? "border-[#c9a96e] text-[#c9a96e] bg-[#c9a96e]/10"
+                : "border-[#1a1a1a] text-gray-600 hover:border-[#c9a96e]/30 hover:text-gray-400"
                 }`}
             >
               {cat.label}
-            </Link>
+            </button>
           ))}
         </div>
 
-        {(!products || products.length === 0) ? (
+        {loading ? (
           /* SKELETON LOADING */
-          <div className="flex-1 flex items-center pb-24 px-4">
-            <div className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex-shrink-0 snap-center">
-                  <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#0a1a3a] bg-[#02040a]">
+          <div className="flex-1 flex items-center justify-center pb-24 px-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="flex-shrink-0">
+                  <div className="relative w-full aspect-[3/4] overflow-hidden border border-[#1a1a1a] bg-[#111]">
                     <Skeleton className="w-full h-full" />
                   </div>
                   <div className="mt-6 space-y-2 text-center">
@@ -165,82 +190,83 @@ export default async function Collection({
               ))}
             </div>
           </div>
+        ) : error ? (
+          <div className="flex-1 flex items-center justify-center pb-24">
+            <p className="text-gray-600">{error}</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center pb-24">
+            <p className="text-gray-600 text-sm tracking-widest">No pieces found in this category.</p>
+          </div>
         ) : (
-          /* Gallery Floor — Horizontal Scroll, MAGNETIC HOVER */
-          <div className="flex-1 flex items-center pb-24 px-4">
-            <div
-              className="flex items-end gap-6 md:gap-10 lg:gap-14 max-w-full mx-auto overflow-x-auto snap-x snap-mandatory pb-12 px-8"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
-            >
-              {products?.map((piece) => {
+          /* Gallery Grid with Ornate Frames */
+          <div className="flex-1 pb-24 px-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
+              {products.map((piece) => {
                 const imageUrl = getImageUrl(piece.hero_image_path);
-                const colors = categoryColors[piece.category] || { glow: "shadow-[#4a90d9]/20", text: "text-[#8ab4e8]" };
+                const colors = categoryColors[piece.category] || { glow: "shadow-[#c9a96e]/20", text: "text-gray-400", border: "border-gray-700" };
 
                 return (
                   <Link
                     key={piece.id}
                     href={`/piece/${piece.id}`}
-                    className="group relative transition-all duration-500 ease-out flex-shrink-0 snap-center"
+                    className="group block"
                   >
-                    {/* MAGNETIC HOVER CONTAINER — stays grounded, glows */}
-                    <div className="relative transition-all duration-500 ease-out">
+                    {/* Ornate Frame Container */}
+                    <div className="relative">
+                      {/* Outer decorative border */}
+                      <div className="absolute -inset-3 border border-[#1a1a1a] opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none" />
 
-                      {/* Ambient shadow — always there */}
-                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/60 rounded-full blur-xl transition-all duration-500 group-hover:w-32 group-hover:blur-2xl" />
+                      {/* Main card with ornate corners */}
+                      <div className="relative aspect-[3/4] bg-[#111] border border-[#222] overflow-hidden group-hover:border-[#c9a96e]/40 transition-all duration-500">
+                        {/* Ornate corner SVG overlay */}
+                        <div className="absolute inset-0 text-[#c9a96e] z-20 pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-500">
+                          <OrnateFrame />
+                        </div>
 
-                      {/* Hover shadow — expands dramatically */}
-                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/40 rounded-full blur-lg transition-all duration-500 group-hover:w-40 group-hover:h-8 group-hover:blur-3xl group-hover:bg-[#4a90d9]/15" />
+                        {/* Inner border line */}
+                        <div className="absolute inset-3 border border-[#2a2a2a]/50 z-10 pointer-events-none group-hover:border-[#c9a96e]/20 transition-colors duration-500" />
 
-                      {/* Floor glow on hover — bioluminescent pool */}
-                      <div className={`absolute -bottom-12 left-1/2 -translate-x-1/2 w-40 h-20 bg-gradient-to-t ${colors.glow.replace('shadow-', 'from-').replace('/30', '/20')} to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl`} />
-
-                      {/* Spotlight beam on hover */}
-                      <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-700">
-                        <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_100%,transparent,rgba(138,180,232,0.06),transparent)]" />
-                      </div>
-
-                      {/* IMAGE CONTAINER — MAGNETIC: scale + glow, no lift */}
-                      <div className="relative w-44 h-56 md:w-52 md:h-64 lg:w-56 lg:h-72 overflow-hidden border border-[#0a1a3a] group-hover:border-[#4a90d9]/50 transition-all duration-500 bg-[#02040a] group-hover:shadow-2xl group-hover:shadow-[#4a90d9]/20 group-hover:scale-[1.03]">
                         {imageUrl ? (
                           <Image
                             src={imageUrl}
                             alt={piece.name}
                             fill
                             className="object-cover transition-all duration-700 group-hover:scale-105"
-                            sizes="(max-width: 768px) 176px, (max-width: 1024px) 208px, 224px"
+                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-[#1a2a4a] text-[10px] tracking-widest">NO IMAGE</span>
+                            <span className="text-[#2a2a2a] text-[10px] tracking-widest">NO IMAGE</span>
                           </div>
                         )}
 
                         {/* Glass sheen */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#4a90d9]/[0.04] via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#c9a96e]/[0.03] via-transparent to-transparent pointer-events-none" />
 
-                        {/* Extra sheen on hover — blue tint */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#4a90d9]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
 
-                        {/* Inner glow border on hover */}
-                        <div className="absolute inset-0 border border-[#4a90d9]/0 group-hover:border-[#4a90d9]/30 transition-all duration-500 pointer-events-none" />
-                      </div>
+                        {/* Corner accent dots */}
+                        <div className="absolute top-4 left-4 w-1 h-1 bg-[#c9a96e]/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute top-4 right-4 w-1 h-1 bg-[#c9a96e]/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute bottom-4 left-4 w-1 h-1 bg-[#c9a96e]/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute bottom-4 right-4 w-1 h-1 bg-[#c9a96e]/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                      {/* Category badge — appears on hover */}
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                        <span className={`text-[8px] tracking-[0.3em] uppercase ${colors.text} bg-[#02040a]/90 px-3 py-1 border border-[#0a1a3a]`}>
-                          {piece.category}
-                        </span>
+                        {/* View button on hover */}
+                        <div className="absolute bottom-6 left-0 right-0 text-center translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-30">
+                          <span className="text-[10px] text-[#c9a96e] tracking-[0.3em] uppercase border border-[#c9a96e]/50 px-4 py-2 bg-[#0a0a0a]/80">
+                            View Piece
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* INFO — stays visible, brightens on hover */}
-                    <div className="mt-6 text-center transition-all duration-500">
-                      <p className="text-[9px] text-[#1a3a5a] tracking-[0.2em] uppercase mb-1 transition-colors duration-500 group-hover:text-[#3a5570]">{piece.collection}</p>
-                      <h3 className="text-[#5a7a9a] font-serif text-sm md:text-base mb-1 transition-all duration-500 group-hover:text-[#8ab4e8] group-hover:tracking-wider">{piece.name}</h3>
-                      <p className="text-[#1a3a5a] text-[10px] tracking-widest transition-colors duration-500 group-hover:text-[#3a5570]">
+                    {/* INFO */}
+                    <div className="mt-5 text-center">
+                      <p className="text-[9px] text-gray-700 tracking-[0.2em] uppercase mb-1">{piece.collection}</p>
+                      <h3 className="text-gray-300 font-serif text-sm md:text-base mb-1 transition-colors duration-500 group-hover:text-[#c9a96e] group-hover:tracking-wider">{piece.name}</h3>
+                      <p className="text-gray-600 text-[10px] tracking-widest">
                         {piece.price_cents === 0 ? "Upon Request" : `$${(piece.price_cents / 100).toLocaleString()}`}
                       </p>
                     </div>

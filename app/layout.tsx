@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-[#0a0a0a] text-white cursor-none`}>
-        <CustomCursor config={{ type: "default", color: "#c9a96e", size: 12, trailLength: 5 }} />
+        <CustomCursor config={{ type: "default", color: "#c9a96e", size: 10, trailLength: 8 }} />
         {children}
       </body>
     </html>

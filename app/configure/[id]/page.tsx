@@ -619,12 +619,41 @@ function CommissionForm({
 }) {
   const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [formError, setFormError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setFormState("submitting");
+    setFormError("");
+    setEmailError("");
 
     const formData = new FormData(e.currentTarget);
+    const email = (formData.get("email") as string).trim();
+    const name = (formData.get("name") as string).trim();
+
+    // Mandatory validation
+    if (!name) {
+      setFormError("Name is required");
+      setFormState("error");
+      return;
+    }
+
+    if (!email) {
+      setEmailError("Email is required");
+      setFormState("error");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      setFormState("error");
+      return;
+    }
+
     const configLines = Object.entries(config)
       .filter(([k, v]) => k !== "engraving" || v)
       .map(([k, v]) => {
@@ -635,8 +664,8 @@ function CommissionForm({
       .join("\n");
 
     const data = {
-      name: formData.get("name"),
-      email: formData.get("email"),
+      name,
+      email,
       message: `Configuration Request for ${piece.name}\n\n${configLines}\n${config.engraving ? `Engraving: "${config.engraving}"\n` : ""}\n\nAdditional notes:\n${formData.get("message") || "None"}`,
       pieceName: `${piece.name} (Custom Configuration)`,
       collection: piece.collection,
@@ -661,11 +690,11 @@ function CommissionForm({
   if (formState === "success") {
     return (
       <div className="text-center py-8">
-        <p className="text-[#8ab4e8] font-serif text-2xl mb-2">Request Received</p>
-        <p className="text-[#5a7a9a] text-sm mb-6">A master jeweler will contact you within 24 hours.</p>
+        <p className="text-[#c9a96e] font-serif text-2xl mb-2">Request Received</p>
+        <p className="text-gray-500 text-sm mb-6">A master jeweler will contact you within 24 hours.</p>
         <button
           onClick={onClose}
-          className="text-xs text-[#3a5570] hover:text-[#8ab4e8] transition-colors tracking-widest uppercase border-b border-[#0a1a3a] hover:border-[#4a90d9] pb-1"
+          className="text-xs text-gray-600 hover:text-[#c9a96e] transition-colors tracking-widest uppercase border-b border-[#1a1a1a] hover:border-[#c9a96e] pb-1"
         >
           Return to Configuration
         </button>
@@ -675,61 +704,68 @@ function CommissionForm({
 
   return (
     <>
-      <h2 className="text-2xl font-serif text-[#8ab4e8] mb-1">Commission</h2>
-      <p className="text-sm text-[#3a5570] mb-6">{piece.name}</p>
+      <h2 className="text-2xl font-serif text-[#c9a96e] mb-1">Commission</h2>
+      <p className="text-sm text-gray-600 mb-6">{piece.name}</p>
 
-      <div className="bg-[#02040a] border border-[#0a1a3a] p-4 mb-6 text-xs space-y-1.5">
-        <p className="text-[#3a5570] tracking-widest uppercase mb-2">Configuration Summary</p>
+      <div className="bg-[#111] border border-[#1a1a1a] p-4 mb-6 text-xs space-y-1.5">
+        <p className="text-gray-600 tracking-widest uppercase mb-2">Configuration Summary</p>
         {catConfig.options.map((opt) => {
           const val = config[opt.key];
           const valLabel = opt.values.find((v) => v.value === val)?.label || val;
           return (
             <div key={opt.key} className="flex justify-between">
-              <span className="text-[#3a5570]">{opt.label}</span>
-              <span className="text-[#5a7a9a]">{valLabel}</span>
+              <span className="text-gray-600">{opt.label}</span>
+              <span className="text-gray-400">{valLabel}</span>
             </div>
           );
         })}
         {config.engraving && (
-          <div className="flex justify-between pt-1 border-t border-[#0a1a3a]">
-            <span className="text-[#3a5570]">Engraving</span>
-            <span className="text-[#5a7a9a]">&ldquo;{config.engraving}&rdquo;</span>
+          <div className="flex justify-between pt-1 border-t border-[#1a1a1a]">
+            <span className="text-gray-600">Engraving</span>
+            <span className="text-gray-400">&ldquo;{config.engraving}&rdquo;</span>
           </div>
         )}
-        <div className="flex justify-between pt-2 border-t border-[#0a1a3a] mt-1">
-          <span className="text-[#3a5570]">Estimate</span>
-          <span className="text-[#8ab4e8]">
+        <div className="flex justify-between pt-2 border-t border-[#1a1a1a] mt-1">
+          <span className="text-gray-600">Estimate</span>
+          <span className="text-[#c9a96e]">
             {totalPrice === 0 ? "Upon Request" : `$${(totalPrice / 100).toLocaleString()}`}
           </span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          type="text"
-          required
-          placeholder="Name"
-          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
-        />
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm"
-        />
+        <div>
+          <label className="block text-[10px] text-gray-600 tracking-widest uppercase mb-1">Name <span className="text-[#c9a96e]">*</span></label>
+          <input
+            name="name"
+            type="text"
+            required
+            placeholder="Your name"
+            className="w-full bg-[#111] border border-[#1a1a1a] px-4 py-3 text-white focus:border-[#c9a96e] focus:outline-none transition-colors text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] text-gray-600 tracking-widest uppercase mb-1">Email <span className="text-[#c9a96e]">*</span></label>
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="your@email.com"
+            className={`w-full bg-[#111] border px-4 py-3 text-white focus:outline-none transition-colors text-sm ${emailError ? 'border-red-800 focus:border-red-600' : 'border-[#1a1a1a] focus:border-[#c9a96e]'}`}
+          />
+          {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
+        </div>
         <textarea
           name="message"
           rows={3}
           placeholder="Additional notes (optional)"
-          className="w-full bg-[#02040a] border border-[#0a1a3a] px-4 py-3 text-[#e5e5e5] focus:border-[#4a90d9] focus:outline-none transition-colors text-sm resize-none"
+          className="w-full bg-[#111] border border-[#1a1a1a] px-4 py-3 text-white focus:border-[#c9a96e] focus:outline-none transition-colors text-sm resize-none"
         />
-        {formState === "error" && <p className="text-red-400 text-xs">{formError}</p>}
+        {formError && !emailError && <p className="text-red-400 text-xs">{formError}</p>}
         <button
           type="submit"
           disabled={formState === "submitting"}
-          className="w-full py-3 bg-[#4a90d9] text-[#02040a] hover:bg-[#5ba3e8] transition-colors tracking-widest text-sm uppercase disabled:opacity-50"
+          className="w-full py-3 bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#b8985d] transition-colors tracking-widest text-sm uppercase font-medium disabled:opacity-50"
         >
           {formState === "submitting" ? "Sending..." : "Submit Commission"}
         </button>

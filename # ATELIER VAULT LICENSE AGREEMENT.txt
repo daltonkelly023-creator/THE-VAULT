@@ -1,0 +1,58 @@
+# ATELIER VAULT LICENSE AGREEMENT
+
+Copyright © 2026 Omarian Wright. All rights reserved.
+
+This software and associated documentation files (the "Software") are the exclusive property of the copyright holder. By purchasing and/or using this Software, you ("Licensee") agree to the following terms:
+
+---
+
+## 1. GRANT OF LICENSE
+
+Subject to the terms and conditions of this Agreement, the copyright holder grants the Licensee a non-exclusive, non-transferable, perpetual license to use, modify, and deploy the Software.
+
+---
+
+## 2. LICENSE TIER: AGENCY / COMMERCIAL
+
+This license is an Agency License.
+
+  Permitted Uses:
+- Deploy the Software for unlimited client projects managed by the Licensee.
+- Modify, customize, and rebrand the Software for specific client needs.
+- Use the Software in commercial projects.
+
+  Prohibited Uses:
+- Resell, redistribute, or sublicense the Software as a standalone product, template, boilerplate, or "website builder."
+- Publish the source code on public repositories, marketplaces, or forums.
+- Share the Software with other agencies, freelancers, or third parties outside of direct client projects.
+- Use the Software to create a competing product or derivative work sold to multiple end-users.
+
+---
+
+ 3. INTELLECTUAL PROPERTY
+
+The copyright holder retains all ownership, copyright, and intellectual property rights to the Software. This license does not constitute a sale of the Software. No title or ownership interest is transferred to the Licensee.
+
+---
+
+# 4. UPDATES
+
+The Licensee is entitled to receive updates to the Software for the lifetime of the product, delivered at the copyright holder's discretion. Updates are provided as a courtesy and do not constitute an ongoing service obligation.
+
+---
+
+## 5. DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+---
+
+## 6. TERMINATION
+
+Any violation of this Agreement will result in immediate termination of the license. The copyright holder reserves the right to pursue legal remedies for unauthorized use or distribution.
+
+---
+
+By purchasing or using this Software, you acknowledge that you have read, understood, and agree to be bound by this License Agreement.
+
+For licensing questions: omarianwright90@gmail.com
