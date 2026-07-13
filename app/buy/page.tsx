@@ -14,7 +14,7 @@ export default function BuyPage() {
           A complete Next.js showroom with commission capture, admin dashboard, and ornate custom design. Deploy for your jewelry clients in 10 minutes.
         </p>
         <a 
-          href="https://your-gumroad-link.com" 
+          href="https:https://nexuslabscripts.lemonsqueezy.com/checkout/buy/f7538685-c4b8-4dd8-9f22-7a4039caa1a9"
           className="bg-[#c9a96e] text-[#0a0a0a] px-10 py-4 text-sm tracking-widest uppercase font-medium hover:bg-[#b8995e] transition-colors"
         >
           Buy Agency License — $499
@@ -70,7 +70,7 @@ export default function BuyPage() {
             <li className="flex items-center gap-3"><span className="text-[#c9a96e]">✦</span> Placeholder images ready to swap</li>
           </ul>
           <a 
-            href="https://your-gumroad-link.com" 
+            href="https://nexuslabscripts.lemonsqueezy.com/checkout/buy/f7538685-c4b8-4dd8-9f22-7a4039caa1a9"
             className="inline-block bg-[#c9a96e] text-[#0a0a0a] px-12 py-4 text-sm tracking-widest uppercase font-medium hover:bg-[#b8995e] transition-colors"
           >
             Buy Now
