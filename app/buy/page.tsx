@@ -17,7 +17,7 @@ export default function BuyPage() {
           href="https:https://nexuslabscripts.lemonsqueezy.com/checkout/buy/f7538685-c4b8-4dd8-9f22-7a4039caa1a9"
           className="bg-[#c9a96e] text-[#0a0a0a] px-10 py-4 text-sm tracking-widest uppercase font-medium hover:bg-[#b8995e] transition-colors"
         >
-          Buy Agency License — $499
+          Buy Agency License — $999
         </a>
         <p className="text-[#555] text-xs mt-4 tracking-wide">
           One-time payment. Unlimited client projects. Lifetime updates.
@@ -60,7 +60,7 @@ export default function BuyPage() {
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-[#c9a96e]"></div>
           
           <p className="text-[#c9a96e] text-sm tracking-[0.3em] uppercase mb-4">One-Time Payment</p>
-          <div className="text-6xl md:text-7xl font-light text-[#e8e4dc] mb-6">$499</div>
+          <div className="text-6xl md:text-7xl font-light text-[#e8e4dc] mb-6">$999</div>
           <ul className="text-left text-[#888] space-y-3 mb-10 max-w-md mx-auto text-sm">
             <li className="flex items-center gap-3"><span className="text-[#c9a96e]">✦</span> Unlimited client projects</li>
             <li className="flex items-center gap-3"><span className="text-[#c9a96e]">✦</span> Full source code (Next.js + Supabase)</li>
