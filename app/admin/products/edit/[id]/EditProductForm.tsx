@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { updateProduct, deleteProduct } from "./actions";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -92,11 +93,15 @@ export default function EditProductForm({ product }: { product: Product }) {
       {/* Live Preview Card */}
       <div className="bg-[#111] border border-[#1a1a1a] rounded p-6 flex gap-6">
         {heroPath ? (
-          <img
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPath}`}
-            alt={product.name}
-            className="w-32 h-32 object-cover rounded border border-[#1a1a1a]"
-          />
+          <div className="relative w-32 h-32 flex-shrink-0">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPath}`}
+              alt={product.name}
+              fill
+              className="object-cover rounded border border-[#1a1a1a]"
+              sizes="128px"
+            />
+          </div>
         ) : (
           <div className="w-32 h-32 bg-[#0a0a0a] border border-[#1a1a1a] rounded flex items-center justify-center text-gray-600 text-xs">
             No Image
@@ -234,11 +239,15 @@ export default function EditProductForm({ product }: { product: Product }) {
           />
           {uploading && <span className="text-xs text-gray-500">Uploading...</span>}
           {heroPath && (
-            <img
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPath}`}
-              alt="Preview"
-              className="w-32 h-32 object-cover rounded border border-[#1a1a1a] mt-2"
-            />
+            <div className="relative w-32 h-32 mt-2">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${heroPath}`}
+                alt="Preview"
+                fill
+                className="object-cover rounded border border-[#1a1a1a]"
+                sizes="128px"
+              />
+            </div>
           )}
           <input type="hidden" name="hero_image_path" value={heroPath} />
         </div>
@@ -256,12 +265,15 @@ export default function EditProductForm({ product }: { product: Product }) {
           {galleryPaths.length > 0 && (
             <div className="grid grid-cols-4 gap-2 mt-2">
               {galleryPaths.map((path, i) => (
-                <img
-                  key={i}
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${path}`}
-                  alt=""
-                  className="w-full h-20 object-cover rounded border border-[#1a1a1a]"
-                />
+                <div key={i} className="relative w-full h-20">
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${path}`}
+                    alt=""
+                    fill
+                    className="object-cover rounded border border-[#1a1a1a]"
+                    sizes="150px"
+                  />
+                </div>
               ))}
             </div>
           )}

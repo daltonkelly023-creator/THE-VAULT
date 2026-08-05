@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabaseServer";
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
@@ -66,12 +67,14 @@ export default async function AdminProductsPage() {
                 key={product.id}
                 className="flex items-center gap-6 bg-[#111] border border-[#1a1a1a] rounded p-4 hover:border-[#c9a96e]/30 transition-colors"
               >
-                <div className="w-16 h-16 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0">
+                <div className="w-16 h-16 bg-[#0a0a0a] rounded overflow-hidden flex-shrink-0 relative">
                   {product.hero_image_path ? (
-                    <img
+                    <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vault-assets/${product.hero_image_path}`}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="64px"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-700 text-[10px]">No Img</div>
