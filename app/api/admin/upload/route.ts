@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseServer";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(request: Request) {
   try {
@@ -12,20 +12,17 @@ export async function POST(request: Request) {
 
     const fileExt = file.name.split(".").pop();
     const fileName = `products/${Date.now()}.${fileExt}`;
-
     const bytes = await file.arrayBuffer();
     const buffer = new Uint8Array(bytes);
 
-    const { error } = await supabase.storage
+    const { error } = await supabaseServer.storage
       .from("vault-assets")
       .upload(fileName, buffer, {
         contentType: file.type,
         upsert: false,
       });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ path: fileName });
   } catch (err: any) {

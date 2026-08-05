@@ -3,14 +3,9 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
   if (!ADMIN_PASSWORD) {
-    return NextResponse.json(
-      { success: false, error: "Admin not configured" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: "Admin not configured" }, { status: 500 });
   }
-
   const formData = await request.formData();
   const password = formData.get("password") as string;
 
@@ -21,10 +16,9 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
     return NextResponse.json({ success: true });
   }
-
   return NextResponse.json({ success: false }, { status: 401 });
 }
