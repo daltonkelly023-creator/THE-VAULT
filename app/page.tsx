@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabaseServer";
+import { supabaseServer as supabase } from "@/lib/supabaseServer";
 import Link from "next/link";
 import Particles from "@/components/Particles";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -86,7 +86,6 @@ export default async function HomePage() {
             </p>
           </AnimatedSection>
 
-          {/* MOVED DOWN — more margin-top */}
           <AnimatedSection delay={0.7}>
             <div className="mt-16">
               <Link
@@ -146,7 +145,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* BRAND STORY */}
+      {/* BRAND STORY - FIXED IMAGE PATH */}
       <section className="py-32 px-8 border-t border-[#1a1a1a]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <AnimatedSection>
@@ -179,7 +178,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* VIDEO */}
+      {/* VIDEO - FIXED TO USE YOUR UPLOADED VIDEO */}
       <section className="py-32 px-8 border-t border-[#1a1a1a]">
         <div className="max-w-5xl mx-auto text-center">
           <AnimatedSection>
@@ -192,12 +191,12 @@ export default async function HomePage() {
 
           <AnimatedSection delay={0.2}>
             <div className="relative aspect-video bg-[#111] border border-[#1a1a1a] rounded overflow-hidden group">
-              <video autoPlay muted loop playsInline poster="/video-poster.jpg" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700">
+              <video autoPlay muted loop playsInline poster="/brand-story.jpg" className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700">
                 <source src="/craftsmanship.mp4" type="video/mp4" />
               </video>
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-20 h-20 rounded-full border border-[#c9a96e]/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                  <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-[#c9a96e] border-b-8 border-b-transparent ml-1" />
+                  <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[12px] border-l-[#c9a96e] border-b-8 border-b-transparent ml-1" />
                 </div>
               </div>
               <div className="absolute bottom-6 left-6">
