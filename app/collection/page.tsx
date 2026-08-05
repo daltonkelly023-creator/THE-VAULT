@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { supabaseServer as supabase } from "@/lib/supabaseServer";
+import { supabase } from "@/lib/supabaseClient";
 import Skeleton from "@/components/Skeleton";
 
 const categories = [
