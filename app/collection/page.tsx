@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseServer as supabase } from "@/lib/supabaseServer";
 import Skeleton from "@/components/Skeleton";
 
 const categories = [
@@ -137,7 +137,6 @@ export default function Collection() {
         <nav className="flex gap-8 text-xs tracking-[0.2em] text-gray-500">
           <Link href="/collection" className="text-[#c9a96e]">Showroom</Link>
           <Link href="/commission" className="hover:text-[#c9a96e] transition-colors">Commission</Link>
-          <Link href="/contact" className="hover:text-[#c9a96e] transition-colors">Contact</Link>
         </nav>
       </header>
 
