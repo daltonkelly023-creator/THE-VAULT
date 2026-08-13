@@ -33,234 +33,282 @@ interface Config {
   engraving?: string;
 }
 
-/* ---------- FACETED GEMSTONE ---------- */
-function FacetedGem({ shape, color }: { shape: string; color: string }) {
-  const isOpaque = color === "#0A0A0A";
+/* ---------- STONE GEOMETRY DEFINITIONS ---------- */
+// All stones are built in local space with y=0 as the girdle plane.
+// Returns the mesh, the horizontal girdle radius, and total height.
 
-  const mat = useMemo(() => {
-    if (isOpaque) {
-      return {
+interface StoneDef {
+  mesh: React.ReactNode;
+  girdleRadius: number;
+  totalHeight: number;
+}
+
+function getStoneDef(shape: string, color: string, isOpaque: boolean): StoneDef {
+  const mat = isOpaque
+    ? { color, metalness: 0.95, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.05 }
+    : {
         color,
-        metalness: 0.95,
-        roughness: 0.08,
+        metalness: 0.05,
+        roughness: 0,
+        transmission: 0.96,
+        thickness: 2.5,
+        ior: 2.42,
         clearcoat: 1,
-        clearcoatRoughness: 0.05,
+        clearcoatRoughness: 0,
+        attenuationColor: color,
+        attenuationDistance: 1.2,
+        dispersion: 0.35,
       };
-    }
-    return {
-      color,
-      metalness: 0.05,
-      roughness: 0,
-      transmission: 0.96,
-      thickness: 2.5,
-      ior: 2.42,
-      clearcoat: 1,
-      clearcoatRoughness: 0,
-      attenuationColor: color,
-      attenuationDistance: 1.2,
-      dispersion: 0.35,
-    };
-  }, [color, isOpaque]);
 
   switch (shape) {
-    case "round":
-      return (
-        <group scale={0.38}>
-          {/* Table (flat top) */}
-          <mesh position={[0, 0.22, 0]}>
-            <cylinderGeometry args={[0.22, 0.35, 0.18, 16]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Crown (upper angled part) */}
-          <mesh position={[0, 0.08, 0]}>
-            <cylinderGeometry args={[0.35, 0.42, 0.12, 16]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Girdle (thin center band) */}
-          <mesh position={[0, 0, 0]}>
-            <cylinderGeometry args={[0.42, 0.42, 0.06, 16]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Pavilion (lower cone) */}
-          <mesh position={[0, -0.22, 0]}>
-            <cylinderGeometry args={[0.15, 0.42, 0.38, 16]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Culet (tiny bottom point) */}
-          <mesh position={[0, -0.42, 0]}>
-            <coneGeometry args={[0.15, 0.04, 16]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-        </group>
-      );
+    case "round": {
+      // Round brilliant: table → crown → girdle → pavilion → culet
+      const girdleR = 0.42;
+      return {
+        girdleRadius: girdleR,
+        totalHeight: 0.76,
+        mesh: (
+          <group>
+            {/* Table */}
+            <mesh position={[0, 0.24, 0]}>
+              <cylinderGeometry args={[0.22, 0.22, 0.18, 16]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Crown: narrows from girdle (0.42) up to table (0.22) */}
+            <mesh position={[0, 0.09, 0]}>
+              <cylinderGeometry args={[0.22, 0.42, 0.12, 16]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Girdle */}
+            <mesh position={[0, 0, 0]}>
+              <cylinderGeometry args={[0.42, 0.42, 0.06, 16]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Pavilion: tapers from girdle (0.42) down to point (0) */}
+            <mesh position={[0, -0.22, 0]}>
+              <cylinderGeometry args={[0.42, 0.0, 0.38, 16]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Culet */}
+            <mesh position={[0, -0.41, 0]}>
+              <coneGeometry args={[0.02, 0.02, 8]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+          </group>
+        ),
+      };
+    }
 
-    case "princess":
-      return (
-        <group scale={0.42}>
-          {/* Table */}
-          <mesh position={[0, 0.18, 0]}>
-            <boxGeometry args={[0.5, 0.14, 0.5]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Crown */}
-          <mesh position={[0, 0.06, 0]}>
-            <boxGeometry args={[0.62, 0.1, 0.62]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Girdle */}
-          <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[0.62, 0.06, 0.62]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Pavilion */}
-          <mesh position={[0, -0.2, 0]} rotation={[0, 0, 0]}>
-            <coneGeometry args={[0.44, 0.34, 4]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-        </group>
-      );
+    case "princess": {
+      const halfW = 0.31;
+      return {
+        girdleRadius: halfW * Math.SQRT2,
+        totalHeight: 0.72,
+        mesh: (
+          <group>
+            <mesh position={[0, 0.20, 0]}>
+              <boxGeometry args={[0.5, 0.14, 0.5]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            <mesh position={[0, 0.06, 0]}>
+              <boxGeometry args={[0.62, 0.10, 0.62]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            <mesh position={[0, 0, 0]}>
+              <boxGeometry args={[0.62, 0.06, 0.62]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* 4-sided pyramid, point DOWN */}
+            <mesh position={[0, -0.20, 0]}>
+              <cylinderGeometry args={[0.44, 0.0, 0.34, 4]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+          </group>
+        ),
+      };
+    }
 
-    case "oval":
-      return (
-        <group scale={[0.32, 0.42, 0.26]}>
-          {/* Smooth oval body with slight faceting via segments */}
-          <mesh>
-            <sphereGeometry args={[0.65, 24, 24]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Flatten top/bottom slightly */}
-          <mesh position={[0, 0.35, 0]} scale={[1, 0.3, 1]}>
-            <sphereGeometry args={[0.55, 16, 8]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-        </group>
-      );
+    case "oval": {
+      const sx = 0.32, sy = 0.42, sz = 0.26;
+      return {
+        girdleRadius: sx * 0.65,
+        totalHeight: sy * 1.3,
+        mesh: (
+          <group scale={[sx, sy, sz]}>
+            <mesh>
+              <sphereGeometry args={[0.65, 32, 32]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+          </group>
+        ),
+      };
+    }
 
-    case "pear":
-      return (
-        <group scale={0.42}>
-          {/* Round top */}
-          <mesh position={[0, 0.12, 0]}>
-            <sphereGeometry args={[0.38, 20, 20]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Tapered bottom */}
-          <mesh position={[0, -0.22, 0]} rotation={[0, 0, 0]}>
-            <coneGeometry args={[0.38, 0.55, 20]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Flat table on top */}
-          <mesh position={[0, 0.38, 0]} rotation={[0, 0, 0]}>
-            <cylinderGeometry args={[0.2, 0.3, 0.08, 12]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-        </group>
-      );
+    case "pear": {
+      const girdleR = 0.35;
+      return {
+        girdleRadius: girdleR,
+        totalHeight: 0.85,
+        mesh: (
+          <group scale={0.42}>
+            {/* Round top */}
+            <mesh position={[0, 0.15, 0]}>
+              <sphereGeometry args={[0.38, 20, 20]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Tapered bottom — cone pointing DOWN */}
+            <mesh position={[0, -0.22, 0]}>
+              <cylinderGeometry args={[0.38, 0.0, 0.55, 20]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            {/* Flat table */}
+            <mesh position={[0, 0.38, 0]}>
+              <cylinderGeometry args={[0.22, 0.28, 0.08, 12]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+          </group>
+        ),
+      };
+    }
 
-    case "emerald":
-      return (
-        <group scale={[0.44, 0.32, 0.3]}>
-          {/* Main body */}
-          <mesh>
-            <boxGeometry args={[0.9, 0.7, 0.55, 2, 2, 2]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Crown step */}
-          <mesh position={[0, 0.32, 0]}>
-            <boxGeometry args={[0.7, 0.12, 0.42]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-          {/* Pavilion step */}
-          <mesh position={[0, -0.32, 0]}>
-            <boxGeometry args={[0.7, 0.12, 0.42]} />
-            <meshPhysicalMaterial {...mat} />
-          </mesh>
-        </group>
-      );
+    case "emerald": {
+      const hx = 0.45, hz = 0.275;
+      return {
+        girdleRadius: Math.sqrt(hx * hx + hz * hz),
+        totalHeight: 0.64,
+        mesh: (
+          <group scale={[0.44, 0.32, 0.30]}>
+            <mesh>
+              <boxGeometry args={[0.9, 0.70, 0.55, 2, 2, 2]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            <mesh position={[0, 0.32, 0]}>
+              <boxGeometry args={[0.72, 0.12, 0.44]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+            <mesh position={[0, -0.32, 0]}>
+              <boxGeometry args={[0.72, 0.12, 0.44]} />
+              <meshPhysicalMaterial {...mat} />
+            </mesh>
+          </group>
+        ),
+      };
+    }
 
-    default:
-      return (
-        <mesh scale={0.4}>
-          <octahedronGeometry args={[0.6, 2]} />
-          <meshPhysicalMaterial {...mat} />
-        </mesh>
-      );
+    default: {
+      return {
+        girdleRadius: 0.35,
+        totalHeight: 0.6,
+        mesh: (
+          <mesh scale={0.4}>
+            <octahedronGeometry args={[0.6, 2]} />
+            <meshPhysicalMaterial {...mat} />
+          </mesh>
+        ),
+      };
+    }
   }
 }
 
 /* ---------- PRONG SETTING ---------- */
-function ProngSetting({ metal, shape }: { metal: string; shape: string }) {
+function ProngSetting({
+  metal,
+  girdleRadius,
+  shape,
+}: {
+  metal: string;
+  girdleRadius: number;
+  shape: string;
+}) {
   const color = metalColors[metal] || "#C5A880";
+  const prongR = girdleRadius * 0.94; // slightly inside stone edge
+  const prongH = 0.18;
+  const baseY = -0.06;
 
-  // Prong positions based on stone shape
-  const prongConfigs = useMemo(() => {
+  const angles = useMemo(() => {
     switch (shape) {
       case "round":
-        return [
-          { pos: [0.22, 0.05, 0.22], rot: [-0.3, 0.8, 0.3] },
-          { pos: [-0.22, 0.05, 0.22], rot: [-0.3, -0.8, -0.3] },
-          { pos: [0.22, 0.05, -0.22], rot: [0.3, 0.8, 0.3] },
-          { pos: [-0.22, 0.05, -0.22], rot: [0.3, -0.8, -0.3] },
-        ];
+        return [0, Math.PI / 2, Math.PI, -Math.PI / 2];
       case "princess":
-        return [
-          { pos: [0.28, 0.05, 0.28], rot: [-0.35, 0, 0.35] },
-          { pos: [-0.28, 0.05, 0.28], rot: [-0.35, 0, -0.35] },
-          { pos: [0.28, 0.05, -0.28], rot: [0.35, 0, 0.35] },
-          { pos: [-0.28, 0.05, -0.28], rot: [0.35, 0, -0.35] },
-        ];
-      case "oval":
-        return [
-          { pos: [0.18, 0.05, 0.28], rot: [-0.3, 0.5, 0.2] },
-          { pos: [-0.18, 0.05, 0.28], rot: [-0.3, -0.5, -0.2] },
-          { pos: [0.18, 0.05, -0.28], rot: [0.3, 0.5, 0.2] },
-          { pos: [-0.18, 0.05, -0.28], rot: [0.3, -0.5, -0.2] },
-        ];
-      case "pear":
-        return [
-          { pos: [0.2, 0.05, 0.18], rot: [-0.3, 0.6, 0.25] },
-          { pos: [-0.2, 0.05, 0.18], rot: [-0.3, -0.6, -0.25] },
-          { pos: [0, 0.05, -0.32], rot: [0.4, 0, 0] },
-        ];
       case "emerald":
-        return [
-          { pos: [0.32, 0.05, 0.22], rot: [-0.25, 0.4, 0.3] },
-          { pos: [-0.32, 0.05, 0.22], rot: [-0.25, -0.4, -0.3] },
-          { pos: [0.32, 0.05, -0.22], rot: [0.25, 0.4, 0.3] },
-          { pos: [-0.32, 0.05, -0.22], rot: [0.25, -0.4, -0.3] },
-        ];
+        return [Math.PI / 4, (3 * Math.PI) / 4, (-3 * Math.PI) / 4, -Math.PI / 4];
+      case "oval":
+        return [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+      case "pear":
+        return [Math.PI / 3, (2 * Math.PI) / 3, -Math.PI / 2];
       default:
-        return [
-          { pos: [0.22, 0.05, 0.22], rot: [-0.3, 0.8, 0.3] },
-          { pos: [-0.22, 0.05, 0.22], rot: [-0.3, -0.8, -0.3] },
-          { pos: [0.22, 0.05, -0.22], rot: [0.3, 0.8, 0.3] },
-          { pos: [-0.22, 0.05, -0.22], rot: [0.3, -0.8, -0.3] },
-        ];
+        return [0, Math.PI / 2, Math.PI, -Math.PI / 2];
     }
   }, [shape]);
 
   return (
     <group>
-      {/* Setting basket (small ring under stone) */}
-      <mesh position={[0, -0.08, 0]}>
-        <torusGeometry args={[0.18, 0.015, 8, 24]} />
-        <meshPhysicalMaterial color={color} metalness={1} roughness={0.12} />
-      </mesh>
-
       {/* Prongs */}
-      {prongConfigs.map((cfg, i) => (
-        <group key={i} position={cfg.pos as [number, number, number]}>
-          <mesh rotation={cfg.rot as [number, number, number]}>
-            <cylinderGeometry args={[0.012, 0.008, 0.28, 8]} />
-            <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
-          </mesh>
-          {/* Prong tip (small ball) */}
-          <mesh position={[0, 0.14, 0]}>
-            <sphereGeometry args={[0.018, 8, 8]} />
-            <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
-          </mesh>
-        </group>
-      ))}
+      {angles.map((a, i) => {
+        const px = Math.cos(a) * prongR;
+        const pz = Math.sin(a) * prongR;
+        const midY = baseY + prongH / 2;
+        const tilt = 0.22;
+        const rotY = -a + Math.PI / 2;
+        return (
+          <group key={i} position={[px, midY, pz]}>
+            <mesh rotation={[tilt, rotY, 0]}>
+              <cylinderGeometry args={[0.012, 0.008, prongH, 8]} />
+              <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
+            </mesh>
+            {/* Tip ball grips the crown just above girdle */}
+            <mesh position={[0, prongH / 2, 0]}>
+              <sphereGeometry args={[0.016, 8, 8]} />
+              <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+/* ---------- GALLERY (connects band to setting) ---------- */
+function Gallery({
+  metal,
+  girdleRadius,
+  lift,
+  tubeRadius,
+}: {
+  metal: string;
+  girdleRadius: number;
+  lift: number;
+  tubeRadius: number;
+}) {
+  const color = metalColors[metal] || "#C5A880";
+  const basketR = girdleRadius * 0.62;
+  const galleryH = lift - tubeRadius - 0.04; // space between band top and prong base
+  if (galleryH <= 0.02) return null;
+
+  const midY = tubeRadius + galleryH / 2;
+
+  return (
+    <group position={[0, midY, 0]}>
+      {/* Open gallery cylinder */}
+      <mesh>
+        <cylinderGeometry args={[basketR, basketR * 0.85, galleryH, 16, 1, true]} />
+        <meshPhysicalMaterial
+          color={color}
+          metalness={1}
+          roughness={0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Top ring */}
+      <mesh position={[0, galleryH / 2, 0]}>
+        <torusGeometry args={[basketR, 0.012, 8, 24]} />
+        <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
+      </mesh>
+      {/* Bottom ring */}
+      <mesh position={[0, -galleryH / 2, 0]}>
+        <torusGeometry args={[basketR * 0.85, 0.012, 8, 24]} />
+        <meshPhysicalMaterial color={color} metalness={1} roughness={0.1} />
+      </mesh>
     </group>
   );
 }
@@ -269,11 +317,12 @@ function ProngSetting({ metal, shape }: { metal: string; shape: string }) {
 function RingBand({ metal, bandWidth }: { metal: string; bandWidth: number }) {
   const color = metalColors[metal] || "#C5A880";
   const roughness = metal === "black-rhodium" ? 0.55 : 0.12;
+  const tubeR = 0.065 * Math.max(bandWidth / 2.2, 0.55);
 
   return (
     <group rotation={[Math.PI / 2, 0, 0]}>
       <mesh>
-        <torusGeometry args={[1.55, 0.065 * Math.max(bandWidth / 2.2, 0.55), 64, 128]} />
+        <torusGeometry args={[1.55, tubeR, 64, 128]} />
         <meshPhysicalMaterial
           color={color}
           metalness={1}
@@ -281,16 +330,6 @@ function RingBand({ metal, bandWidth }: { metal: string; bandWidth: number }) {
           clearcoat={0.9}
           clearcoatRoughness={0.08}
           envMapIntensity={1.3}
-        />
-      </mesh>
-      {/* Inner comfort fit (slightly rounded inner edge) */}
-      <mesh scale={[0.98, 0.98, 0.95]}>
-        <torusGeometry args={[1.55, 0.065 * Math.max(bandWidth / 2.2, 0.55), 32, 64]} />
-        <meshPhysicalMaterial
-          color={color}
-          metalness={1}
-          roughness={roughness + 0.05}
-          envMapIntensity={0.8}
         />
       </mesh>
     </group>
@@ -303,25 +342,49 @@ function RingScene({ config }: { config: Config }) {
 
   useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.4) * 0.025;
+      groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.4) * 0.02;
     }
   });
 
   const stoneColor = stoneColors[config.stoneColor as string] || "#E8F8FF";
-  const lift = 0.18 + (config.stoneHeight as number) * 0.6;
+  const isOpaque = stoneColor === "#0A0A0A";
+
+  const stoneDef = useMemo(
+    () => getStoneDef(config.stoneShape as string, stoneColor, isOpaque),
+    [config.stoneShape, stoneColor, isOpaque]
+  );
+
+  const tubeR = 0.065 * Math.max((config.bandWidth as number) / 2.2, 0.55);
+  const lift = tubeR + 0.14 + (config.stoneHeight as number) * 0.45;
 
   return (
     <group ref={groupRef} rotation={[0.25, 0, 0]}>
       <RingBand metal={config.metal as string} bandWidth={config.bandWidth as number} />
 
+      {/* Gallery bridges band to setting */}
+      <Gallery
+        metal={config.metal as string}
+        girdleRadius={stoneDef.girdleRadius}
+        lift={lift}
+        tubeRadius={tubeR}
+      />
+
       {/* Stone Setting */}
       <group position={[0, lift, 0]}>
-        <ProngSetting metal={config.metal as string} shape={config.stoneShape as string} />
-        <FacetedGem shape={config.stoneShape as string} color={stoneColor} />
+        <ProngSetting
+          metal={config.metal as string}
+          girdleRadius={stoneDef.girdleRadius}
+          shape={config.stoneShape as string}
+        />
+        {stoneDef.mesh}
 
-        {/* Internal sparkle for transparent stones */}
-        {!stoneColor.includes("0A0A0A") && (
-          <pointLight color={stoneColor} intensity={0.6} distance={2.5} position={[0.1, 0.1, 0.15]} />
+        {!isOpaque && (
+          <pointLight
+            color={stoneColor}
+            intensity={0.5}
+            distance={2}
+            position={[0.08, 0.08, 0.12]}
+          />
         )}
       </group>
     </group>
@@ -333,7 +396,7 @@ export default function ThreeRing({ config }: { config: Record<string, any> }) {
   return (
     <div className="w-full h-full">
       <Canvas
-        camera={{ position: [0, 0.5, 4.2], fov: 30 }}
+        camera={{ position: [0, 0.5, 4.5], fov: 28 }}
         gl={{
           antialias: true,
           alpha: true,
