@@ -62,3 +62,49 @@ a, button, [data-cursor-hover], input, textarea, select {
   transform: translateY(-4px);
   box-shadow: 0 0 40px rgba(201, 169, 110, 0.12);
 }
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #c9a96e;
+  border: 2px solid #02040a;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #1a1a1a;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #c9a96e;
+  border: 2px solid #02040a;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #1a1a1a;
+}
+
+/* Custom premium scrollbar for configure panel */
+.custom-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(201,169,110,0.2), rgba(201,169,110,0.35));
+  border-radius: 3px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(201,169,110,0.35), rgba(201,169,110,0.5));
+}

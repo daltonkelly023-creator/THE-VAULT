@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Skeleton from "@/components/Skeleton";
+import Particles from "@/components/Particles";
+import OrnateCorner from "@/components/OrnateCorner";
 
 const categories = [
   { key: "all", label: "All" },
@@ -22,67 +24,6 @@ const categoryColors: Record<string, { glow: string; text: string; border: strin
   earring: { glow: "shadow-rose-500/30", text: "text-rose-300", border: "border-rose-500/30" },
   watch: { glow: "shadow-slate-400/30", text: "text-slate-300", border: "border-slate-400/30" },
 };
-
-/* ---------- ORNATE CORNER FRAME SVG ---------- */
-function OrnateFrame({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-    >
-      {/* Top-left corner */}
-      <path
-        d="M 0 15 Q 0 0 15 0 L 25 0 L 25 2 L 15 2 Q 2 2 2 15 L 2 25 L 0 25 Z"
-        fill="currentColor"
-        opacity="0.6"
-      />
-      <path
-        d="M 0 8 Q 0 0 8 0 L 12 0 L 12 1.5 L 8 1.5 Q 1.5 1.5 1.5 8 L 1.5 12 L 0 12 Z"
-        fill="currentColor"
-        opacity="0.4"
-      />
-      {/* Top-right corner */}
-      <path
-        d="M 100 15 Q 100 0 85 0 L 75 0 L 75 2 L 85 2 Q 98 2 98 15 L 98 25 L 100 25 Z"
-        fill="currentColor"
-        opacity="0.6"
-      />
-      <path
-        d="M 100 8 Q 100 0 92 0 L 88 0 L 88 1.5 L 92 1.5 Q 98.5 1.5 98.5 8 L 98.5 12 L 100 12 Z"
-        fill="currentColor"
-        opacity="0.4"
-      />
-      {/* Bottom-left corner */}
-      <path
-        d="M 0 85 Q 0 100 15 100 L 25 100 L 25 98 L 15 98 Q 2 98 2 85 L 2 75 L 0 75 Z"
-        fill="currentColor"
-        opacity="0.6"
-      />
-      <path
-        d="M 0 92 Q 0 100 8 100 L 12 100 L 12 98.5 L 8 98.5 Q 1.5 98.5 1.5 92 L 1.5 88 L 0 88 Z"
-        fill="currentColor"
-        opacity="0.4"
-      />
-      {/* Bottom-right corner */}
-      <path
-        d="M 100 85 Q 100 100 85 100 L 75 100 L 75 98 L 85 98 Q 98 98 98 85 L 98 75 L 100 75 Z"
-        fill="currentColor"
-        opacity="0.6"
-      />
-      <path
-        d="M 100 92 Q 100 100 92 100 L 88 100 L 88 98.5 L 92 98.5 Q 98.5 98.5 98.5 92 L 98.5 88 L 100 88 Z"
-        fill="currentColor"
-        opacity="0.4"
-      />
-      {/* Decorative flourishes */}
-      <circle cx="5" cy="5" r="1" fill="currentColor" opacity="0.3" />
-      <circle cx="95" cy="5" r="1" fill="currentColor" opacity="0.3" />
-      <circle cx="5" cy="95" r="1" fill="currentColor" opacity="0.3" />
-      <circle cx="95" cy="95" r="1" fill="currentColor" opacity="0.3" />
-    </svg>
-  );
-}
 
 export default function Collection() {
   const [products, setProducts] = useState<any[]>([]);
@@ -122,11 +63,14 @@ export default function Collection() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#e5e5e5] relative overflow-hidden">
-      {/* Background atmosphere */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d0d] to-[#0a0a0a]" />
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-[#111]/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#050505]/60 to-transparent" />
+      <Particles />
+
+      {/* Background atmosphere — radial gold glows matching configure panel */}
+      <div className="fixed inset-0 pointer-events-none z-[2]">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[60vh] bg-[radial-gradient(ellipse_at_center,rgba(201,169,110,0.12),transparent_60%)]" />
+        <div className="absolute top-0 left-0 w-[30vw] h-[30vh] bg-[radial-gradient(ellipse_at_top_left,rgba(201,169,110,0.08),transparent_70%)]" />
+        <div className="absolute bottom-0 right-0 w-[35vw] h-[40vh] bg-[radial-gradient(ellipse_at_bottom_right,rgba(201,169,110,0.08),transparent_70%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/10 via-transparent to-[#0a0a0a]/60" />
       </div>
 
       {/* NAV HEADER — Same as homepage */}
@@ -141,34 +85,81 @@ export default function Collection() {
       </header>
 
       {/* Content */}
-      <div className="relative min-h-screen flex flex-col pt-24">
+      <div className="relative min-h-screen flex flex-col pt-24 z-[3]">
+        {/* Ornate corners for the showroom stage */}
+        <div className="pointer-events-none fixed top-28 left-6 z-40 w-14 h-14 opacity-70 text-[#c9a96e]">
+          <OrnateCorner position="top-left" />
+        </div>
+        <div className="pointer-events-none fixed top-28 right-6 z-40 w-14 h-14 opacity-70 text-[#c9a96e]">
+          <OrnateCorner position="top-right" />
+        </div>
+        <div className="pointer-events-none fixed bottom-10 left-6 z-40 w-14 h-14 opacity-60 text-[#c9a96e]">
+          <OrnateCorner position="bottom-left" />
+        </div>
+        <div className="pointer-events-none fixed bottom-10 right-6 z-40 w-14 h-14 opacity-60 text-[#c9a96e]">
+          <OrnateCorner position="bottom-right" />
+        </div>
+
         {/* Header */}
-        <div className="text-center pt-20 pb-10">
-          <h1 className="text-5xl md:text-6xl font-serif text-[#c9a96e] tracking-widest mb-3">
-            The Showroom
+        <div className="text-center pt-20 pb-10 relative">
+          <div className="pointer-events-none absolute top-16 left-1/2 -translate-x-1/2 w-[300px] h-[100px] bg-[radial-gradient(ellipse_at_center,rgba(201,169,110,0.22),transparent_70%)] blur-md" />
+          <p className="text-[9px] tracking-[0.5em] text-[#c9a96e]/80 uppercase mb-5">
+            ★  Private Collection  ★
+          </p>
+          <h1 className="text-5xl md:text-6xl font-serif tracking-[0.25em] leading-none mb-3"
+            style={{
+              color: "#c9a96e",
+              textShadow: "0 0 30px rgba(201,169,110,0.25), 0 2px 20px rgba(0,0,0,0.8)",
+            }}
+          >
+            THE SHOWROOM
           </h1>
-          <p className="text-xs text-gray-600 tracking-[0.3em] uppercase">
-            Select a category to filter
+          <div className="flex items-center justify-center gap-4 mt-5 mb-2">
+            <span className="w-16 h-px bg-gradient-to-r from-transparent via-[#c9a96e]/50 to-transparent" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a96e] animate-pulse" />
+            <span className="w-16 h-px bg-gradient-to-r from-transparent via-[#c9a96e]/50 to-transparent" />
+          </div>
+          <p className="text-xs text-gray-500 tracking-[0.35em] uppercase">
+            Select a category to explore
           </p>
         </div>
 
-        {/* Category Filters */}
+        {/* Category Filters — "alive": hover lift + glow, sliding underline, pulsing active dot */}
         <div className="flex flex-wrap justify-center gap-2 mb-16 px-4">
-          {categories.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => {
-                setActiveCategory(cat.key);
-                setLoading(true);
-              }}
-              className={`px-5 py-2 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ${activeCategory === cat.key
-                ? "border-[#c9a96e] text-[#c9a96e] bg-[#c9a96e]/10"
-                : "border-[#1a1a1a] text-gray-600 hover:border-[#c9a96e]/30 hover:text-gray-400"
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat.key;
+            return (
+              <button
+                key={cat.key}
+                onClick={() => {
+                  if (isActive) return;
+                  setActiveCategory(cat.key);
+                  setLoading(true);
+                }}
+                className={`group/cat relative px-5 py-2.5 text-[10px] tracking-[0.2em] uppercase border transition-all duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 ${
+                  isActive
+                    ? "border-[#c9a96e] text-[#c9a96e] bg-[#c9a96e]/10 shadow-[0_0_18px_rgba(201,169,110,0.2)]"
+                    : "border-[#1a1a1a] text-gray-600 hover:border-[#c9a96e]/40 hover:text-gray-300 hover:shadow-[0_0_12px_rgba(201,169,110,0.1)]"
                 }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+              >
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`w-1 h-1 rounded-full bg-[#c9a96e] transition-all duration-300 ${
+                      isActive ? "opacity-100 scale-100 animate-pulse" : "opacity-0 scale-0"
+                    }`}
+                  />
+                  {cat.label}
+                </span>
+                <span
+                  className={`pointer-events-none absolute left-1/2 -bottom-px h-px -translate-x-1/2 bg-[#c9a96e] transition-all duration-300 ease-out ${
+                    isActive
+                      ? "w-2/3 opacity-100"
+                      : "w-0 opacity-0 group-hover/cat:w-1/3 group-hover/cat:opacity-60"
+                  }`}
+                />
+              </button>
+            );
+          })}
         </div>
 
         {loading ? (
@@ -211,18 +202,15 @@ export default function Collection() {
                     href={`/piece/${piece.id}`}
                     className="group block"
                   >
-                    {/* Ornate Frame Container */}
+                    {/* Card frame */}
                     <div className="relative">
-                      {/* Outer decorative border */}
-                      <div className="absolute -inset-3 border border-[#1a1a1a] opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none" />
+                      {/* Soft gold glow that blooms outward on hover — reads as premium at
+                          thumbnail scale, where fine filigree just turns into visual noise */}
+                      <div className="absolute -inset-2 bg-[radial-gradient(ellipse_at_center,rgba(201,169,110,0.35),transparent_70%)] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                      <div className="absolute -inset-px border border-[#1a1a1a] opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none" />
 
-                      {/* Main card with ornate corners */}
-                      <div className="relative aspect-[3/4] bg-[#111] border border-[#222] overflow-hidden group-hover:border-[#c9a96e]/40 transition-all duration-500">
-                        {/* Ornate corner SVG overlay */}
-                        <div className="absolute inset-0 text-[#c9a96e] z-20 pointer-events-none opacity-60 group-hover:opacity-100 transition-opacity duration-500">
-                          <OrnateFrame />
-                        </div>
-
+                      {/* Main card */}
+                      <div className="relative aspect-[3/4] bg-[#111] border border-[#222] overflow-hidden group-hover:border-[#c9a96e]/60 group-hover:shadow-[0_0_30px_rgba(201,169,110,0.15)] transition-all duration-500">
                         {/* Inner border line */}
                         <div className="absolute inset-3 border border-[#2a2a2a]/50 z-10 pointer-events-none group-hover:border-[#c9a96e]/20 transition-colors duration-500" />
 

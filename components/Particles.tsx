@@ -9,7 +9,7 @@ interface Particle {
   speedY: number;
   opacity: number;
   fadeSpeed: number;
-  color: string; // blue or red
+  color: string;
 }
 
 export default function Particles() {
@@ -26,60 +26,86 @@ export default function Particles() {
     let particles: Particle[] = [];
 
     function resize() {
-      canvas!.width = canvas!.parentElement?.clientWidth || window.innerWidth;
-      canvas!.height = canvas!.parentElement?.clientHeight || window.innerHeight;
+      // Size to the viewport (not the full scrollable page). The canvas is
+      // position:fixed, so this keeps particles visible in every screen's
+      // worth of content instead of spawning once at the bottom of a page
+      // that might be thousands of pixels tall and slowly drifting up over
+      // several minutes before anyone scrolls far enough to see them.
+      canvas!.width = window.innerWidth;
+      canvas!.height = window.innerHeight;
     }
 
-    function createParticle(): Particle {
-      // 70% blue, 30% red (like showroom bioluminescence)
+    function createParticle(bottomSeed = true): Particle {
       const isRed = Math.random() < 0.3;
       const color = isRed 
-        ? `201, 64, 64`   // red bioluminescence
-        : `74, 144, 217`; // ocean blue
+        ? `201, 64, 64`
+        : `74, 144, 217`;
       
+      // Optionally seed anywhere (for initial spread)
+      const y = bottomSeed
+        ? canvas!.height + Math.random() * 80
+        : Math.random() * canvas!.height;
+
       return {
         x: Math.random() * canvas!.width,
-        y: canvas!.height + Math.random() * 100, // Start below parent
+        y,
         size: Math.random() * 2 + 0.5,
-        speedY: Math.random() * 0.5 + 0.2,
-        opacity: 0,
-        fadeSpeed: Math.random() * 0.002 + 0.001,
+        speedY: Math.random() * 0.45 + 0.2,
+        opacity: bottomSeed ? 0 : Math.random() * 0.28 + 0.05,
+        fadeSpeed: Math.random() * 0.002 + 0.0012,
         color,
       };
     }
 
     function init() {
       particles = [];
-      // Fewer particles for hero: 30 instead of 60
-      for (let i = 0; i < 30; i++) {
-        const p = createParticle();
-        p.y = canvas!.height + Math.random() * 200;
-        p.opacity = Math.random() * 0.3;
-        particles.push(p);
+      // Seed particles across THE ENTIRE canvas on init (so top of page has them too)
+      const targetCount = 60;
+      for (let i = 0; i < targetCount; i++) {
+        particles.push(createParticle(false));
       }
     }
 
     function animate() {
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
+      const H = canvas!.height;
+
       particles.forEach((p, i) => {
         p.y -= p.speedY;
 
-        // Fade in as they rise from bottom, fade out as they reach top
-        if (p.y > canvas!.height - 100) {
+        // Fade in as they rise from the bottom 18% region
+        if (p.y > H * 0.82) {
           p.opacity += p.fadeSpeed * 2;
-        } else if (p.y < 100) {
-          p.opacity -= p.fadeSpeed * 3;
+        }
+        // Gentle fade as they enter the top 15% region
+        if (p.y < H * 0.15) {
+          const t = Math.max(0, p.y) / (H * 0.15);
+          p.opacity = Math.min(p.opacity, 0.18 + t * 0.22);
+          if (p.y < 0) p.opacity -= p.fadeSpeed * 4;
         }
 
-        if (p.opacity <= 0 || p.y < -20) {
-          particles[i] = createParticle();
+        p.opacity = Math.max(0, Math.min(p.opacity, 0.4));
+
+        if (p.opacity <= 0 || p.y < -30) {
+          particles[i] = createParticle(true);
           return;
         }
 
+        // Draw a soft bioluminescent glow — outer halo + core
+        const r = p.size;
+        const halo = ctx!.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3.2);
+        halo.addColorStop(0, `rgba(${p.color}, ${Math.min(p.opacity * 1.6, 0.7)})`);
+        halo.addColorStop(0.35, `rgba(${p.color}, ${p.opacity * 0.4})`);
+        halo.addColorStop(1, `rgba(${p.color}, 0)`);
         ctx!.beginPath();
-        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(${p.color}, ${Math.min(p.opacity, 0.4)})`;
+        ctx!.fillStyle = halo;
+        ctx!.arc(p.x, p.y, r * 3.2, 0, Math.PI * 2);
+        ctx!.fill();
+
+        ctx!.beginPath();
+        ctx!.fillStyle = `rgba(255,255,255,${Math.min(p.opacity, 0.9)})`;
+        ctx!.arc(p.x, p.y, r * 0.45, 0, Math.PI * 2);
         ctx!.fill();
       });
 
@@ -90,18 +116,22 @@ export default function Particles() {
     init();
     animate();
 
-    window.addEventListener("resize", resize);
+    const onResize = () => {
+      resize();
+      init();
+    };
+    window.addEventListener("resize", onResize);
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none"
       style={{ zIndex: 1 }}
     />
   );
